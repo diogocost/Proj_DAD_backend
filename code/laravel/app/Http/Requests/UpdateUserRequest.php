@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCategoryRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,9 +21,16 @@ class UpdateCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => 'required|string|max:255',
-            'type' => 'required|in:C,D',
+            'email' => 'required|email',
         ];
+
+        // Check if user_type is 'V' (Vcard) to apply photo_file rule
+        if ($this->input('user_type') === 'V') {
+            $rules['photo_file'] = 'nullable|file|image';
+        }
+
+        return $rules;
     }
 }

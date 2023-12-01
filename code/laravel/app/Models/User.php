@@ -12,15 +12,39 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    // ...
+
+    /**
+     * Find the user instance for the given username.
+     *
+     * @param  string  $username
+     * @return \App\Models\User|null
+     */
+    public function findForPassport($username)
+    {
+        //Indica ao passport que iremos usar o campo username da view para autenticar
+        return $this->where('username', $username)->first();
+    }
+
+
+    protected $table = 'view_auth_users';
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
+        'username',
         'name',
         'email',
         'password',
+        'photo_url',
+        'user_type',
+        /*'name',
+        'email',
+        'password',*/
     ];
 
     /**
@@ -30,7 +54,8 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
+        'confirmation_code',
+        //'remember_token',
     ];
 
     /**
@@ -39,7 +64,18 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        //'email_verified_at' => 'datetime',
+        'confirmation_code' => 'hashed',
         'password' => 'hashed',
     ];
+
+    public function isAdmin()
+    {
+        return $this->user_type === 'A';
+    }
+
+    public function isVcard()
+    {
+        return $this->user_type === 'V';
+    }
 }
