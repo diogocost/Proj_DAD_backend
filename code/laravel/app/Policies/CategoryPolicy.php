@@ -28,7 +28,7 @@ class CategoryPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->user_type == "V";
     }
 
     /**
@@ -44,7 +44,7 @@ class CategoryPolicy
      */
     public function delete(User $user, Category $category): bool
     {
-        //
+        return $user->id == $category->vcard;
     }
 
     /**

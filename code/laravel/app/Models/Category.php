@@ -19,6 +19,7 @@ class Category extends Model
     protected $fillable = [
         'name',
         'type',
+        'vcard'
     ];
 
     public function vCard() {

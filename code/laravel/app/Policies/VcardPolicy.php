@@ -16,4 +16,19 @@ class VcardPolicy
     {
         return $vcard->phone_number == $user->id;
     }
+
+    public function viewTransactions(User $user, Vcard $vcard)
+    {
+        return $vcard->phone_number == $user->id;
+    }
+
+    public function view(User $user, Vcard $vcard)
+    {
+        return $vcard->phone_number == $user->id || $user->user_type == "A";
+    }
+
+    public function delete(User $user, Vcard $vcard)
+    {
+        return $vcard->phone_number == $user->id && $vcard->balance == 0;
+    }
 }

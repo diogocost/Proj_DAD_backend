@@ -21,4 +21,8 @@ class UserPolicy
     {
         return $user->id == $model->id;
     }
+    public function create(?User $user)
+    {
+        return $user ? $user->user_type == "A" : true;
+    }
 }

@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Vcard extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'vcards';
     protected $primaryKey = 'phone_number';
@@ -54,15 +56,18 @@ class Vcard extends Model
         return $this->belongsTo(Users::class, 'user_type', 'user_type')->where('user_type', 'V');
     }
 
-    public function categories() {
-        return $this->hasMany(Category::class);
+    public function categories()
+    {
+        return $this->hasMany(Category::class, 'vcard');
     }
 
-    public function transactions() {
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class);
     }
 
-    public function initializeDefaultCategories() {
+    public function initializeDefaultCategories()
+    {
         $defaultCategories = DefaultCategory::all();
 
         foreach ($defaultCategories as $defaultCategory) {
