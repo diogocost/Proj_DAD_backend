@@ -1,3 +1,3 @@
 <template>
-    transaction
+    transaction table
 </template>

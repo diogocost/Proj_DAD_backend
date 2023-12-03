@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-//import { useUserStore } from "../stores/user.js"
+import { useUserStore } from "../stores/user.js"
 import HomeView from '../views/HomeView.vue'
 //import Dashboard from "../components/Dashboard.vue"
 import Login from "../components/auth/Login.vue"
@@ -16,7 +16,7 @@ import Statistics from "../components/statistics/Statistics.vue"
 //import Task from "../components/tasks/Task.vue"
 //import Project from "../components/projects/Project.vue"
 
-//let handlingFirstRoute = true
+let handlingFirstRoute = true
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,47 +49,78 @@ const router = createRouter({
       name: 'NewVcard',
       component: Vcard,
       props: { id: -1 }
-    }, 
-    {
-        path: '/vcards/:id',
-        name: 'Vcard',
-        component: Vcard,
-        //props: true
-        // Replaced with the following line to ensure that id is a number
-        props: route => ({ id: parseInt(route.params.id) })
-    }, 
-    {
-        path: '/vcards',
-        name: 'Vcards',
-        component: Vcards,
     },
     {
-        path: '/transactions',
-        name: 'Transactions',
-        component: Transactions,
-    },  
+      path: '/vcards/:id',
+      name: 'Vcard',
+      component: Vcard,
+      //props: true
+      // Replaced with the following line to ensure that id is a number
+      props: route => ({ id: parseInt(route.params.id) })
+    },
     {
-        path: '/transactions/new',
-        name: 'NewTransactions',
-        component: Transaction,
-        props: { id: -1 }
-      },
+      path: '/vcards',
+      name: 'Vcards',
+      component: Vcards,
+    },
     {
-        path: '/categories',
-        name: 'Categories',
-        component: Categories,
-    }, 
+      path: '/transactions',
+      name: 'Transactions',
+      component: Transactions,
+    },
     {
-        path: '/administrators',
-        name: 'Administrators',
-        component: Administrators,
-    },      
+      path: '/transactions/new',
+      name: 'NewTransactions',
+      component: Transaction,
+      props: { id: -1 }
+    },
+    {
+      path: '/categories',
+      name: 'Categories',
+      component: Categories,
+      props: { CategoriesTitle: 'Categories' }
+    },
+    {
+      path: '/categories/new',
+      name: 'NewCategories',
+      component: Categories,
+    },
+    {
+      path: '/administrators',
+      name: 'Administrators',
+      component: Administrators,
+    },
     {
       path: '/statistics',
       name: 'Statistics',
       component: Statistics,
     },
   ]
+})
+
+router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore()
+  if (handlingFirstRoute) {
+    handlingFirstRoute = false
+    await userStore.restoreToken()
+  }
+  if ((to.name == 'Login') || (to.name == 'home') || (to.name == 'NewUser')) {
+    next()
+    return
+  }
+  if (!userStore.user) {
+    next({ name: 'Login' })
+    return
+  }
+  if (to.name == 'User') {
+    if ((userStore.user.type == 'A') || (userStore.user.id == to.params.id)) {
+      next()
+      return
+    }
+    next({ name: 'home' })
+    return
+  }
+  next()
 })
 
 

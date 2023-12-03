@@ -1,5 +1,6 @@
 <script setup>
 import axios from 'axios'
+import { onMounted } from 'vue'
 import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useToast } from "vue-toastification"
 import { useUserStore } from './stores/user.js'
@@ -28,6 +29,10 @@ const clickMenuOption = () => {
     }
   }
 }
+
+/* onMounted(() => {
+  userStore.restoreToken()
+}) */
 </script>
 
 
@@ -69,7 +74,8 @@ const clickMenuOption = () => {
               <li>
                 <router-link class="dropdown-item"
                   :class="{ active: $route.name == 'Vcard' && $route.params.id == userStore.userId }"
-                  :to="{ name: 'Vcard', params: { id: userStore.userId } }" @click="clickMenuOption"> <!-- userStore.userId -->
+                  :to="{ name: 'Vcard', params: { id: userStore.userId } }" @click="clickMenuOption">
+                  <!-- userStore.userId -->
                   <i class="bi bi-person-square"></i>
                   Profile
                 </router-link>
