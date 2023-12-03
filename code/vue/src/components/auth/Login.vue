@@ -1,18 +1,18 @@
 <script setup>
 import axios from 'axios'
-///import { useToast } from "vue-toastification"
+import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
-//import { useUserStore } from '../../stores/user.js'
+import { useUserStore } from '../../stores/user.js'
 import { ref } from 'vue'
 
-//const toast = useToast()
+const toast = useToast()
 const router = useRouter()
-//const userStore = useUserStore()
+const userStore = useUserStore()
 
 const credentials = ref({
-      username: '',
-      password: ''
-  })
+  username: '',
+  password: ''
+})
 
 const emit = defineEmits(['login'])
 
@@ -30,8 +30,7 @@ const login = async () => {
 </script>
 
 <template>
-  <form
-    class="row g-3 needs-validation" novalidate @submit.prevent="login">
+  <form class="row g-3 needs-validation" novalidate @submit.prevent="login">
     <h3 class="mt-5 mb-3">Login</h3>
     <hr>
     <div class="mb-3">
@@ -47,7 +46,7 @@ const login = async () => {
       </div>
     </div>
     <div class="mb-3 d-flex justify-content-center">
-      <button type="button" class="btn btn-primary px-5" @click="login">Login</button>
+      <button type="button" class="btn btn-primary px-5" @click.prevent="login">Login</button>
     </div>
   </form>
 </template>

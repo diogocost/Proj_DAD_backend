@@ -1,21 +1,19 @@
 <script setup>
+import axios from 'axios'
 import { useRouter, RouterLink, RouterView } from 'vue-router'
-//import { useToast } from "vue-toastification"
-//import { useUserStore } from './stores/user.js'
+import { useToast } from "vue-toastification"
+import { useUserStore } from './stores/user.js'
 //import { useProjectsStore } from "./stores/projects.js"
 
-//const toast = useToast()
-//const userStore = useUserStore()
+const userStore = useUserStore()
 //const projectsStore = useProjectsStore()
-const userStore = {
-  userId: 1
-}
+
 const router = useRouter()
+const toast = useToast()
 
 const logout = async () => {
   if (await userStore.logout()) {
     toast.success('User has logged out of the application.')
-    clickMenuOption()
     router.push({ name: 'home' })
   } else {
     toast.error('There was a problem logging out of the application!')
@@ -47,35 +45,38 @@ const clickMenuOption = () => {
 
       <div class="collapse navbar-collapse justify-content-end">
         <ul class="navbar-nav">
-          <li class="nav-item" > <!-- v-show="!userStore.user" -->
-            <router-link class="nav-link" :class="{ active: $route.name === 'NewVcard'}" :to="{ name: 'NewVcard' }" @click="clickMenuOption" >
+          <li class="nav-item" v-show="!userStore.user"> <!-- v-show="!userStore.user" -->
+            <router-link class="nav-link" :class="{ active: $route.name === 'NewVcard' }" :to="{ name: 'NewVcard' }"
+              @click="clickMenuOption">
               <i class="bi bi-person-check-fill"></i>
               Register
-            </router-link >
+            </router-link>
           </li>
-          <li class="nav-item" > <!-- v-show="!userStore.user" -->
-            <router-link class="nav-link" :class="{ active: $route.name === 'Login' }" :to="{ name: 'Login' }" @click="clickMenuOption"> <!-- :class="{ active: $route.name === 'Login' }" -->
+          <li class="nav-item" v-show="!userStore.user"> <!-- v-show="!userStore.user" -->
+            <router-link class="nav-link" :class="{ active: $route.name === 'Login' }" :to="{ name: 'Login' }"
+              @click="clickMenuOption"> <!-- :class="{ active: $route.name === 'Login' }" -->
               <i class="bi bi-box-arrow-in-right"></i>
               Login
             </router-link>
           </li>
-          <li class="nav-item dropdown" > <!-- v-show="userStore.user" -->
+          <li class="nav-item dropdown" v-show="userStore.user"> <!-- v-show="userStore.user" -->
             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
               data-bs-toggle="dropdown" aria-expanded="false">
-              <!-- :src="userStore.userPhotoUrl" --><img  class="rounded-circle z-depth-0 avatar-img" alt="avatar image">
-              <span class="avatar-text"> <!-- {{ userStore.userName }} --> </span>
+              <img :src="userStore.userPhotoUrl" class="rounded-circle z-depth-0 avatar-img" alt="avatar image">
+              <span class="avatar-text">{{ userStore.userName }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
               <li>
-                <router-link class="dropdown-item" 
-                  :class="{ active: $route.name == 'Vcard' && $route.params.id == userStore.userId }" 
-                  :to="{ name: 'Vcard', params: { id: 1} }" @click="clickMenuOption"> <!-- userStore.userId -->
+                <router-link class="dropdown-item"
+                  :class="{ active: $route.name == 'Vcard' && $route.params.id == userStore.userId }"
+                  :to="{ name: 'Vcard', params: { id: userStore.userId } }" @click="clickMenuOption"> <!-- userStore.userId -->
                   <i class="bi bi-person-square"></i>
                   Profile
                 </router-link>
               </li>
               <li>
-                <router-link class="dropdown-item" :class="{ active: $route.name === 'ChangePassword' }" :to="{ name: 'ChangePassword' }" @click="clickMenuOption"> <!--  -->
+                <router-link class="dropdown-item" :class="{ active: $route.name === 'ChangePassword' }"
+                  :to="{ name: 'ChangePassword' }" @click="clickMenuOption"> <!--  -->
                   <i class="bi bi-key-fill"></i>
                   Change password
                 </router-link>
@@ -98,51 +99,59 @@ const clickMenuOption = () => {
     <div class="row">
       <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
         <div class="position-sticky pt-3">
-          <ul class="nav flex-column" > <!-- v-if="userStore.user" -->
+          <ul class="nav flex-column"> <!-- v-if="userStore.user" -->
             <li class="nav-item">
-              <router-link class="nav-link" :class="{ active: $route.name === 'Dashboard' }" :to="{ name: 'home' }" @click="clickMenuOption"> <!--  -->
+              <router-link class="nav-link" :class="{ active: $route.name === 'Dashboard' }" :to="{ name: 'home' }"
+                @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-house"></i>
                 Dashboard
               </router-link>
             </li>
             <li class="nav-item d-flex justify-content-between align-items-center pe-3">
-              <router-link class="nav-link w-100 me-3" :class="{ active: $route.name === 'Transactions' }" :to="{ name: 'Transactions' }" @click="clickMenuOption"> <!--  -->
+              <router-link class="nav-link w-100 me-3" :class="{ active: $route.name === 'Transactions' }"
+                :to="{ name: 'Transactions' }" @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-list-check"></i>
                 Transactions
               </router-link>
-              <router-link class="link-secondary" :to="{ name: 'NewTransactions' }" aria-label="Add a new transaction" @click="clickMenuOption"> <!--  -->
+              <router-link class="link-secondary" :to="{ name: 'NewTransactions' }" aria-label="Add a new transaction"
+                @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-xs bi-plus-circle"></i>
               </router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" :class="{ active: $route.name === 'Categories' }" :to="{ name: 'Categories' }" @click="clickMenuOption"> <!--  -->
-                  <i class="bi bi-files"></i>
-                    Categories
-                </router-link>
+              <router-link class="nav-link" :class="{ active: $route.name === 'Categories' }" :to="{ name: 'Categories' }"
+                @click="clickMenuOption"> <!--  -->
+                <i class="bi bi-files"></i>
+                Categories
+              </router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" :class="{ active: $route.name === 'Administrators' }" :to="{ name: 'Administrators' }" @click="clickMenuOption"> <!--  -->
-                  <i class="bi bi-files"></i>
-                    ADM Manage Administrators
-                </router-link>
+              <router-link class="nav-link" :class="{ active: $route.name === 'Administrators' }"
+                :to="{ name: 'Administrators' }" @click="clickMenuOption"> <!--  -->
+                <i class="bi bi-files"></i>
+                ADM Manage Administrators
+              </router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" :class="{ active: $route.name === 'Vcards' }" :to="{ name: 'Vcards' }" @click="clickMenuOption"> <!--  -->
-                  <i class="bi bi-files"></i>
-                    ADM Manage Vcards
-                </router-link>
+              <router-link class="nav-link" :class="{ active: $route.name === 'Vcards' }" :to="{ name: 'Vcards' }"
+                @click="clickMenuOption"> <!--  -->
+                <i class="bi bi-files"></i>
+                ADM Manage Vcards
+              </router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" :class="{ active: $route.name === 'Categories' }" :to="{ name: 'Categories' }" @click="clickMenuOption"> <!--  -->
-                  <i class="bi bi-files"></i>
-                    ADM Default Categories List
-                </router-link>
+              <router-link class="nav-link" :class="{ active: $route.name === 'Categories' }" :to="{ name: 'Categories' }"
+                @click="clickMenuOption"> <!--  -->
+                <i class="bi bi-files"></i>
+                ADM Default Categories List
+              </router-link>
             </li>
-            <li class="nav-item" > <!-- v-show="userStore.user?.type == 'A'" -->
-            <router-link class="nav-link" :class="{ active: $route.name === 'Statistics' }" :to="{ name: 'Statistics' }" @click="clickMenuOption"> <!--  -->
+            <li class="nav-item"> <!-- v-show="userStore.user?.type == 'A'" -->
+              <router-link class="nav-link" :class="{ active: $route.name === 'Statistics' }" :to="{ name: 'Statistics' }"
+                @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-bar-chart-line"></i>
-                BOTH Statistics 
-            </router-link>
+                BOTH Statistics
+              </router-link>
             </li>
           </ul>
 
@@ -156,8 +165,6 @@ const clickMenuOption = () => {
       </main>
     </div>
   </div>
-
-  
 </template>
 
 <style>
