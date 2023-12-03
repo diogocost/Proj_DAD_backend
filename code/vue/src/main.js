@@ -11,6 +11,9 @@ import Toast from "vue-toastification"
 import { createPinia } from 'pinia'
 import "vue-toastification/dist/index.css"
 
+import FieldErrorMessage from './components/global/FieldErrorMessage.vue'
+import ConfirmationDialog from './components/global/ConfirmationDialog.vue'
+
 const app = createApp(App)
 
 //const apiDomain = import.meta.env.VITE_API_DOMAIN
@@ -53,5 +56,8 @@ app.use(Toast, {
 
 app.use(createPinia())
 app.use(router)
+
+app.component('FieldErrorMessage', FieldErrorMessage)
+app.component('ConfirmationDialog', ConfirmationDialog)
 
 app.mount('#app')
