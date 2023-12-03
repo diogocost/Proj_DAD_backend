@@ -1,0 +1,3 @@
+<template>
+    Administrators
+</template>
