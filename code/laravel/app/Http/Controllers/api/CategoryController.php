@@ -62,7 +62,8 @@ class CategoryController extends Controller
                 $category->delete();
             else
                 $category->forceDelete();
-            return response()->json(['message' => 'Category deleted successfully'], 200);
+            // return response()->json(['message' => 'Category deleted successfully'], 200);
+            return new CategoryResource($category);
         } catch (\Exception $ex) {
             return response()->json(['message' => 'Error deleting category'], 500);
         }
