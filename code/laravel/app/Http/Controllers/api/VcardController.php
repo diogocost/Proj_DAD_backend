@@ -11,6 +11,15 @@ use App\Models\Vcard;
 
 class VcardController extends Controller
 {
+
+    public function index(Request $request)
+    {
+
+
+        return VcardResource::collection(Vcard::all());
+
+
+    }
     public function updatesConfirmationCode(UpdateUserConfirmationCodeRequest $request, Vcard $vcard)
     {
         $password = bcrypt($request->current_password);
@@ -68,4 +77,72 @@ class VcardController extends Controller
             return response()->json(['message' => 'Error deleting vcard'], 500);
         }
     }
+
+
+    public function filter(Request $request)
+    {
+        // Apply filters based on request parameters
+        $query = Vcard::query();
+
+        if ($request->has('blocked')) {
+            $query->where('blocked', $request->blocked);
+        }
+
+        // Add more filters as needed
+
+        $vcards = $query->get();
+
+        return VcardResource::collection($vcards);
+    }
+
+    public function search(Request $request)
+    {
+        // Apply search based on request parameters
+        $query = Vcard::query();
+
+        if ($request->has('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('phone_number', 'like', "%$searchTerm%")
+                    ->orWhere('name', 'like', "%$searchTerm%")
+                    ->orWhere('email', 'like', "%$searchTerm%");
+            });
+        }
+
+        // Add more search criteria as needed
+
+        $vcards = $query->get();
+
+        return VcardResource::collection($vcards);
+    }
+
+
+    public function block(Vcard $vcard,Request $request)
+    {
+        $vcard->blocked = $request->input('blocked', 1);
+        $vcard->save();
+
+
+        return new VcardResource($vcard);
+    }
+
+
+    public function unblock(Vcard $vcard,Request $request)
+    {
+        $vcard->blocked = $request->input('blocked', 0);
+        $vcard->save();
+
+
+        return new VcardResource($vcard);
+    }
+
+    public function updateMaxDebit(Request $request, Vcard $vcard)
+    {
+
+        $vcard->max_debit = $request->validated('max_debit'); 
+        $vcard->save();
+
+        return new VcardResource($vcard);
+    }
+
 }

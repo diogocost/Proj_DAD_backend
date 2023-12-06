@@ -7,6 +7,8 @@ use App\Http\Controllers\api\CategoryController;
 use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\VcardController;
 use App\Http\Controllers\api\TransactionController;
+use App\Http\Controllers\api\AdminController;
+
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [UserController::class, 'store'])->middleware('can:create,App\Models\User');
@@ -22,6 +24,12 @@ Route::middleware('auth:api')->group(function () {
         Route::patch('vcards/{vcard}/confirmation_code', [VcardController::class, 'updatesConfirmationCode'])->middleware('can:updateConfirmationCode,vcard');
         Route::get('vcards/{vcard}/categories', [CategoryController::class, 'getCetegoriesOfVcard'])->middleware('can:viewCategories,vcard');
         Route::get('vcards/{vcard}/transactions', [TransactionController::class, 'getTransactionsOfVcard'])->middleware('can:viewTransactions,vcard');
+        
+        Route::get('vcards/{vcard}', [VcardController::class, 'show'])->middleware('can:view,vcard');
+        Route::delete('vcards/{vcard}', [VcardController::class, 'destroy'])->middleware('can:delete,vcard');   //returns unauthorized
+        Route::patch('vcards/{vcard}/block', [VcardController::class, 'block'])->middleware('can:block,vcard'); // CONFIRMAR URL
+        Route::patch('vcards/{vcard}/unblock', [VcardController::class, 'unblock'])->middleware('can:unblock,vcard'); // CONFIRMAR URL
+        Route::patch('vcards/{vcard}/max-debit', [VcardController::class, 'updateMaxDebit'])->middleware('can:updateMaxDebit,Vcard'); // CONFIRMAR URL
 
         //Category routes
         Route::get('categories/{category}', [CategoryController::class, 'show'])->middleware('can:view,category');
@@ -33,5 +41,15 @@ Route::middleware('auth:api')->group(function () {
         Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->middleware('can:view,transaction');
         Route::post('transactions', [TransactionController::class, 'store'])->middleware('can:create,App\Models\Transaction');
         Route::patch('transactions/{transaction}', [TransactionController::class, 'update'])->middleware('can:update,transaction');
+
+        //Admin routes
+        Route::get('admins/{admin}', [AdminController::class, 'show'])->middleware('can:view,admin');
+        Route::get('admins', [AdminController::class, 'index'])->middleware('can:viewAny,admin');   //NOT WORKING
+        Route::delete('admins/{admin}', [AdminController::class, 'destroy'])->middleware('can:delete,admin');
+
+        
+        
+
+
     }
 );
