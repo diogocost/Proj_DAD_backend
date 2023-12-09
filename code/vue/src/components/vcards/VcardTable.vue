@@ -11,7 +11,7 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  showId: {
+  showPhoneNumber: {
     type: Boolean,
     default: true,
   },
@@ -19,19 +19,31 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  showAdmin: {
+  showBlocked: {
     type: Boolean,
     default: true,
   },
-  showGender: {
+  showBalance: {
     type: Boolean,
-    default: false,
+    default: true,
+  },
+  showDebitLimit: {
+    type: Boolean,
+    default: true,
   },
   showPhoto: {
     type: Boolean,
     default: true,
   },
   showEditButton: {
+    type: Boolean,
+    default: true,
+  },
+  showDeleteButton: {
+    type: Boolean,
+    default: true,
+  },
+  showAddCreditButton: {
     type: Boolean,
     default: true,
   },
@@ -53,7 +65,11 @@ const canViewUserDetail = (userId) => {
   if (!userStore.user) {
     return false
   }
-  return userStore.user.type == 'A' || userStore.user.id == userId
+  return userStore.user.user_type == 'A' || userStore.user.id == userId
+}
+
+const toggleBlockClick = (user) => {
+  emit("toggleBlock", user)
 }
 </script>
 
@@ -61,35 +77,80 @@ const canViewUserDetail = (userId) => {
   <table class="table">
     <thead>
       <tr>
-        <th v-if="showId" class="align-middle">#</th>
         <th v-if="showPhoto" class="align-middle">Photo</th>
+        <th v-if="showPhoneNumber" class="align-middle">Phone Number</th>        
         <th class="align-middle">Name</th>
         <th v-if="showEmail" class="align-middle">Email</th>
-        <th v-if="showAdmin" class="align-middle">Admin?</th>
-        <th v-if="showGender" class="align-middle">Gender</th>
+        <th v-if="showBalance" class="align-middle">Balance</th>
+        <th v-if="showDebitLimit" class="align-middle">Debit Limit</th>
+        <th v-if="showBlocked" class="align-middle">Blocked</th>        
+        
+        <th class="text-end" v-if="showBlocked || showEditButton || showDeleteButton"></th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="user in users" :key="user.id">
-        <td v-if="showId" class="align-middle">{{ user.id }}</td>
+      <tr v-for="user in users" :key="user.phone_number">
         <td v-if="showPhoto" class="align-middle">
           <img :src="photoFullUrl(user)" class="rounded-circle img_photo" />
         </td>
+        <td v-if="showPhoneNumber" class="align-middle">{{ user.phone_number }}</td>
         <td class="align-middle">{{ user.name }}</td>
         <td v-if="showEmail" class="align-middle">{{ user.email }}</td>
-        <td v-if="showAdmin" class="align-middle">{{ user.type == "A" ? "Sim" : "" }}</td>
-        <td v-if="showGender" class="align-middle">{{ user.gender_name }}</td>
-        <td class="text-end align-middle" v-if="showEditButton">
-          <div class="d-flex justify-content-end" v-if="canViewUserDetail(user.id)">
+        <td v-if="showDebitLimit" class="align-middle">{{ user.balance + "€"}}</td>
+        <td v-if="showDebitLimit" class="align-middle">{{ user.max_debit + "€"}}</td>
+        <td v-if="showBlocked" class="align-middle text-center">{{ user.blocked == true ? "Sim" : "" }}</td>
+        
+
+        <td
+          class="text-end align-middle"
+          v-if="showBlocked || showEditButton || showDeleteButton"
+        >
+          <div class="d-flex justify-content-end">
+            <button
+              style="min-width:90px;"
+              class="btn btn-xs "
+              :class="{'btn-danger': !user.blocked,}"
+              @click="toggleBlockClick(user)"
+              v-if="showBlocked && user.blocked == false"
+            >
+              Block
+            </button>
+            <button
+              style="min-width:90px;"
+              class="btn btn-xs"
+              :class="{'btn-success': user.blocked,}"
+              @click="toggleBlockClick(user)"
+              v-if="showBlocked && user.blocked == true"
+            >
+              Unblock
+            </button>
+
             <button
               class="btn btn-xs btn-light"
-              @click="editClick(user)"
+              @click="editClick(task)"
               v-if="showEditButton"
             >
               <i class="bi bi-xs bi-pencil"></i>
             </button>
+
+            <button
+              class="btn btn-xs btn-light"
+              @click="editClick(task)"
+              v-if="showAddCreditButton"
+            >
+              <i class="bi bi-xs bi-plus-circle"></i>
+            </button>
+
+            <button
+              class="btn btn-xs btn-light"
+              @click="deleteClick(task)"
+              v-if="showDeleteButton"
+            >
+              <i class="bi bi-xs bi-x-square-fill"></i>
+            </button>
           </div>
         </td>
+
       </tr>
     </tbody>
   </table>
