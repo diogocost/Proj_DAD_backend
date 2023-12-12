@@ -102,7 +102,7 @@ const categoryToDeleteName = computed(() => categoryToDelete.value
                 <td>
                     <span>{{ category.name }}</span>
                 </td>
-                <td v-if="showType">{{ category.type === 'D' ? 'Debito' : category.type === 'C' ? 'Credito' : '' }}</td>
+                <td v-if="showType">{{ category.type === 'D' ? 'Debit' : category.type === 'C' ? 'Credit' : '' }}</td>
                 <td class="text-end" v-if="showEditButton || showDeleteButton">
                     <div class="d-flex justify-content-end">
                         <button class="btn btn-xs btn-light" @click.prevent="editClick(category)" v-if="showEditButton">

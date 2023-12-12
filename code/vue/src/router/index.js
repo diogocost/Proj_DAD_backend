@@ -7,6 +7,7 @@ import ChangePassword from "../components/auth/ChangePassword.vue"
 import Transactions from "../components/transactions/Transactions.vue"
 import Transaction from "../components/transactions/Transaction.vue"
 import Categories from "../components/categories/Categories.vue"
+import Category from "../components/categories/Category.vue"
 import Administrators from "../components/administrators/Administrators.vue"
 import Vcard from "../components/vcards/Vcard.vue"
 import Vcards from "../components/vcards/Vcards.vue"
@@ -84,12 +85,18 @@ const router = createRouter({
       path: '/categories',
       name: 'Categories',
       component: Categories,
-      props: { CategoriesTitle: 'Categories' }
+    },
+    {
+      path: '/categories/:id',
+      name: 'Category',
+      component: Category,
+      props: route => ({ id: parseInt(route.params.id) })
     },
     {
       path: '/categories/new',
       name: 'NewCategories',
-      component: Categories,
+      component: Category,
+      props: { id: -1 }
     },
     {
       path: '/administrators',
@@ -109,19 +116,6 @@ router.beforeEach(async (to, from, next) => {
   if (handlingFirstRoute) {
     handlingFirstRoute = false
     await userStore.restoreToken()
-  }
-  if ((to.name == 'Login') || (to.name == 'home') || (to.name == 'NewUser')) {
-    next()
-    return
-  }
-  
-  if (to.name == 'User') {
-    if ((userStore.user.type == 'A') || (userStore.user.id == to.params.id)) {
-      next()
-      return
-    }
-    next({ name: 'home' })
-    return
   }
   next()
 })
