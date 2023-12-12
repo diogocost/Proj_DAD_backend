@@ -25,12 +25,12 @@ class UpdateTransactionRequest extends FormRequest
     {
         return [
             'category_id' => [
-                'sometimes',
+                'nullable',
                 Rule::exists('categories', 'id')->where(function ($query) {
                     $query->where('vcard', Auth::guard('api')->user()->id);
                 }),
             ],
-            'description' => ['sometimes', 'string'],
+            'description' => ['nullable', 'string'],
         ];
     }
 }

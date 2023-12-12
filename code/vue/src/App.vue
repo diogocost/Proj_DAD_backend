@@ -119,7 +119,7 @@ const clickMenuOption = () => {
                 <i class="bi bi-list-check"></i>
                 Transactions
               </router-link>
-              <router-link class="link-secondary" :to="{ name: 'NewTransactions' }" aria-label="Add a new transaction"
+              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new transaction"
                 @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-xs bi-plus-circle"></i>
               </router-link>

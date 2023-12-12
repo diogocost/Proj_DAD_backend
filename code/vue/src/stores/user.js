@@ -9,6 +9,7 @@ export const useUserStore = defineStore('user', () => {
     const user = ref(null)
     const userName = computed(() => user.value?.name ?? 'Anonymous')
     const userId = computed(() => user.value?.id ?? -1)
+    const userIsAdmin = computed(() => user.value?.type === 'A')
 
     const userPhotoUrl = computed(() =>
         user.value?.photo_url
