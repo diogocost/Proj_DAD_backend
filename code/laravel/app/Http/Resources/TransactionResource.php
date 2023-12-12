@@ -12,8 +12,21 @@ class TransactionResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-    public function toArray(Request $request): array
+    public function toArray($request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'date' => $this->date,
+            'datetime' => $this->datetime,
+            'type' => $this->type,
+            'value' => $this->value,
+            'old_balance' => $this->old_balance,
+            'new_balance' => $this->new_balance,
+            'payment_type' => $this->payment_type,
+            'payment_reference' => $this->payment_reference,
+            'category_id' => $this->category_id,
+            'category_name' => $this->category ? $this->category->name : '-- No Category --',
+            'description' => $this->description,
+        ];
     }
 }

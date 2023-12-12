@@ -10,7 +10,6 @@ import router from './router'
 import Toast from "vue-toastification"
 import { createPinia } from 'pinia'
 import "vue-toastification/dist/index.css"
-
 import FieldErrorMessage from './components/global/FieldErrorMessage.vue'
 import ConfirmationDialog from './components/global/ConfirmationDialog.vue'
 
@@ -33,7 +32,7 @@ app.provide(
   })
 ) */
 
-const serverBaseUrl = 'http://127.0.0.1:8000'
+const serverBaseUrl = 'http://laravel.test'
 app.provide('serverBaseUrl', serverBaseUrl)  
 // Default Axios configuration
 axios.defaults.baseURL = serverBaseUrl + '/api'

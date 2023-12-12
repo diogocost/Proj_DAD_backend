@@ -31,11 +31,16 @@ class TransactionController extends Controller
             }
 
             if ($request->has('transaction_type')) {
-                $query->where('transaction_type', $request->input('transaction_type'));
+                $query->where('type', $request->input('transaction_type'));
             }
 
             if ($request->has('category_id')) {
-                $query->where('category_id', $request->input('category_id'));
+                $categoryFilter = $request->input('category_id');
+                if($categoryFilter > 0){
+                    $query->where('category_id', $request->input('category_id'));
+                }else{
+                    $query->whereNull('category_id');
+                }
             }
 
             if ($request->has('pair_vcard')) {
@@ -55,7 +60,7 @@ class TransactionController extends Controller
             }
 
             // Fetch and return the results
-            $transactions = $query->orderByDesc('datetime')->paginate(10);
+            $transactions = $query->get();
 
             return TransactionResource::collection($transactions);
         } catch (\Exception $ex) {
