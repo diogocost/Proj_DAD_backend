@@ -8,18 +8,55 @@ use Illuminate\Http\Request;
 use App\Http\Resources\VcardResource;
 use App\Http\Requests\UpdateUserConfirmationCodeRequest;
 use App\Models\Vcard;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
+
 
 class VcardController extends Controller
 {
 
     public function index(Request $request)
     {
+        
+        try {
+            $query = Vcard::query();
 
+            // Apply filters
+            if ($request->has('blocked')) {
+                $query->where('blocked', $request->input('blocked'));
+            }
 
-        return VcardResource::collection(Vcard::all());
+            if ($request->has('min_balance')) {
+                $query->where('balance', '>=', $request->input('min_balance'));
+            }
+
+            if ($request->has('max_balance')) {
+                $query->where('balance', '<=',$request->input('max_balance'));
+            }
+
+            if ($request->has('created_at_start')) {
+                $query->whereDate('created_at', '>=', $request->input('created_at_start'));
+            }
+
+            if ($request->has('created_at_end')) {
+                $query->whereDate('created_at', '<=', $request->input('created_at_end'));
+            }
+
+            // Fetch and return the results
+            $vcards = $query->get();
+
+            return VcardResource::collection($vcards);
+        } catch (\Exception $ex) {
+            // Handle any exceptions or errors
+            return response()->json(['message' => 'Error fetching vCards', 'error' => $ex->getMessage()], 500);
+        }
 
 
     }
+
+
+
     public function updatesConfirmationCode(UpdateUserConfirmationCodeRequest $request, Vcard $vcard)
     {
         $password = bcrypt($request->current_password);
@@ -45,24 +82,33 @@ class VcardController extends Controller
 
     public function destroy(DeleteVcardRequest $request, Vcard $vcard)
     {
+        
+        
         $password = bcrypt($request->password);
         $confirmation_code = bcrypt($request->confirmation_code);
         $messages = [];
 
-        // Check if the password is correct
-        if ($password != $vcard->password) {
-            $messages['password'] = 'The password field is incorrect!';
+        $user=Auth::guard('api')->user();
+        if (!$user->user_type == 'A') {
+            $password = bcrypt($request->password);
+            $confirmation_code = bcrypt($request->confirmation_code);
+    
+            $messages = [];
+    
+            // Check if the password is correct
+            if ($password != $vcard->password) {
+                $messages['password'] = 'The password field is incorrect!';
+            }
+    
+            // Check if the confirmation code is provided and valid
+            if ($confirmation_code != $vcard->confirmation_code) {
+                $messages['confirmation_code'] = 'The confirmation code field is incorrect!';
+            }
+    
+            if (!empty($messages)) {
+                return response()->json(['messages' => $messages], 403);
+            }
         }
-
-        // Check if the confirmation code is provided and valid
-        if ($confirmation_code != $vcard->confirmation_code) {
-            $messages['confirmation_code'] = 'The confirmation code field is incorrect!';
-        }
-
-        if (!empty($messages)) {
-            return response()->json(['messages' => $messages], 403);
-        }
-
         try {
             if($vcard->transactions()->count() > 0){
                 $vcard->transactions()->delete();
@@ -94,6 +140,7 @@ class VcardController extends Controller
 
         return VcardResource::collection($vcards);
     }
+    
 
     public function search(Request $request)
     {
