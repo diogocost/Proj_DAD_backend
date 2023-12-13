@@ -34,21 +34,14 @@ class VcardPolicy
     }
     
 
-
-    public function block(User $user)
+    public function manageVcard(User $user, Vcard $vcard)
     {
+        // Define your logic to determine if the user can manage the vcard
         return $user->isAdmin();
     }
+    
 
-    public function unblock(User $user)
-    {
-        return $user->isAdmin();
-    }
 
-    public function updateMaxDebit(User $user)
-    {
-        return $user->isAdmin();
-    }
 
     public function showAll(User $user)
     {

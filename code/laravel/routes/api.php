@@ -28,10 +28,8 @@ Route::middleware('auth:api')->group(function () {
 
         Route::get('vcards/{vcard}', [VcardController::class, 'show'])->middleware('can:view,vcard');
         Route::delete('vcards/{vcard}', [VcardController::class, 'destroy'])->middleware('can:destroy,App\Models\VCard');   // NOT working
-        Route::patch('vcards/{vcard}/block', [VcardController::class, 'block'])->middleware('can:block,vcard'); // working
-        Route::patch('vcards/{vcard}/unblock', [VcardController::class, 'unblock'])->middleware('can:unblock,vcard'); // working
-        Route::patch('vcards/{vcard}/max_debit', [VcardController::class, 'updateMaxDebit'])->middleware('can:updateMaxDebit,App\Models\VCard'); // NOT working
-
+        Route::patch('vcards/{vcard}', [VcardController::class, 'manageVcard'])->middleware('can:manageVcard,vcard');
+        
         //Category routes
         Route::get('categories/{category}', [CategoryController::class, 'show'])->middleware('can:view,category');
         Route::post('categories', [CategoryController::class, 'store'])->middleware('can:create,App\Models\Category');
