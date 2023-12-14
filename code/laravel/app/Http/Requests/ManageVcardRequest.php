@@ -3,10 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
 
-class UpdateTransactionRequest extends FormRequest
+class ManageVcardRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,13 +22,8 @@ class UpdateTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'category_id' => [
-                'nullable',
-                Rule::exists('categories', 'id')->where(function ($query) {
-                    $query->where('vcard', Auth::guard('api')->user()->id);
-                }),
-            ],
-            'description' => ['nullable', 'string'],
+            'blocked' => 'sometimes|boolean',
+            'max_debit' => 'sometimes|numeric|min:0'
         ];
     }
 }

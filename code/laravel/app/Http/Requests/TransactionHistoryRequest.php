@@ -29,9 +29,7 @@ class TransactionHistoryRequest extends FormRequest
             'transaction_type' => ['sometimes', 'in:D,C'],
             'category_id' => [
                 'sometimes',
-                Rule::exists('categories', 'id')->where(function ($query) {
-                    $query->where('vcard', Auth::guard('api')->user()->id);
-                }),
+                'integer',
             ],
             'pair_vcard' => ['sometimes', 'exists:vcards,phone_number'],
             'payment_type' => ['sometimes', 'in:IBAN,VCARD,MBWAY,PAYPAL,MB,VISA'],
