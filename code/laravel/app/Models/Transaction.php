@@ -31,5 +31,9 @@ class Transaction extends Model
         'description',
         'payment_type',
         'payment_reference',
+        'date',
+        'datetime',
+        'old_balance',
+        'new_balance',
     ];
 }

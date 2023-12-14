@@ -33,7 +33,7 @@ const props = defineProps({
 })
 
 const columns = ref([
-  { headerName: 'Date', field: 'date', sortable: true, sort: 'desc', sortingOrder: ['asc', 'desc'] },
+  { headerName: 'Date', field: 'datetime', sortable: true, sort: 'desc', sortingOrder: ['asc', 'desc'] },
   { headerName: 'Type', field: 'type', minWidth: 70, maxWidth: 90, sortable: false },
   {
     headerName: 'Value', field: 'value', sortable: true, minWidth: 80, maxWidth: 100, sortingOrder: ['asc', 'desc'],
@@ -69,7 +69,6 @@ const columns = ref([
 ]);
 
 function editClick(transaction) {
-  console.log('Edit Clicked:', transaction);
   emit('edit', transaction);
 }
 
@@ -81,7 +80,6 @@ watch(
   () => props.transactions,
   (newTransactions) => {
     editingTransactions.value = newTransactions
-    console.log('Editing Transactions:', editingTransactions.value);
   }
 )
 setTimeout(() => {
@@ -94,7 +92,7 @@ setTimeout(() => {
 
 <template>
   <ag-grid-vue style="width: 100%; height: 100%;" :rowHeight="45" class="ag-theme-quartz" :columnDefs="columns"
-    :rowData="editingTransactions" :paginationAutoPageSize="true" :pagination="true">
+    :rowData="editingTransactions" :pagination="true">
   </ag-grid-vue>
 </template>
 

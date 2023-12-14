@@ -7,24 +7,22 @@ import { ref, watch, computed } from 'vue'
 
 import TransactionDetail from "./TransactionDetail.vue"
 import { useTransactionsStore } from "../../stores/transactions.js"
-import { useCategoriesStore } from '../../stores/categories'
 
 const toast = useToast()
 const router = useRouter()
 const userStore = useUserStore()
 const transactionsStore = useTransactionsStore()
-const categoriesStore = useCategoriesStore()
 
 const newtransaction = () => {
   return {
     id: null,
-    vcard: userStore.userId,
+    vcard: userStore.userIsAdmin ? '' : userStore.userId,
     pair_vcard: '',
     description: '',
     value: null,
-    type: null,
+    type: userStore.userIsAdmin ? 'C' : 'D',
     category_id: null,
-    payment_type: '',
+    payment_type: userStore.userIsAdmin ? '' : 'VCARD',
     payment_reference: ''
   }
 }
@@ -32,7 +30,7 @@ const transaction = ref(newtransaction())
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
 let originalValueStr = ''
-  
+
 const loadTransaction = async (id) => {
   originalValueStr = ''
   errors.value = null
@@ -40,35 +38,45 @@ const loadTransaction = async (id) => {
     transaction.value = newtransaction()
     originalValueStr = JSON.stringify(transaction.value)
   } else {
-      try {
-        const response = await axios.get('transactions/' + id)
-        transaction.value = response.data.data
-        originalValueStr = JSON.stringify(transaction.value)
-      } catch (error) {
-        console.log(error)
-      }
+    try {
+      const response = await axios.get('transactions/' + id)
+      transaction.value = response.data.data
+      originalValueStr = JSON.stringify(transaction.value)
+    } catch (error) {
+      toast.error('Error loading transaction #' + id + '!')
+    }
   }
 }
 
 const save = async () => {
   errors.value = null
   if (operation.value == 'insert') {
+    const newTransaction = {
+      vcard: transaction.value.vcard,
+      payment_reference: transaction.value.payment_reference,
+      value: transaction.value.value, type: transaction.value.type,
+      category_id: transaction.value.category_id,
+      payment_type: transaction.value.payment_type,
+      description: transaction.value.description,
+      pair_vcard: transaction.value.pair_vcard,
+    };
     console.log('inserting transaction', transaction.value)
     try {
-      transaction.value = await transactionsStore.insertTransaction(transaction.value)
+      transaction.value = await transactionsStore.insertTransaction(newTransaction)
       originalValueStr = JSON.stringify(transaction.value)
       toast.success('Transaction #' + transaction.value.id + ' was created successfully.')
       router.back()
     } catch (error) {
-      if (error.response.status == 422) {
+      if (error.response?.status == 422) {
         errors.value = error.response.data.errors
+        console.log(error)
         toast.error('Transaction was not created due to validation errors!')
       } else {
+        console.log(error)
         toast.error('Transaction was not created due to unknown server error!')
       }
     }
   } else {
-    console.log('Updating transaction', transaction.value)
     try {
       transaction.value = await transactionsStore.updateTransaction(transaction.value)
       originalValueStr = JSON.stringify(transaction.value)
@@ -98,17 +106,16 @@ const props = defineProps({
 })
 
 
-const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'update')
+const operation = computed(() => (!props.id || props.id < 0) ? 'insert' : 'update')
 
-  // beforeRouteUpdate was not fired correctly
-  // Used this watcher instead to update the ID
+// beforeRouteUpdate was not fired correctly
+// Used this watcher instead to update the ID
 watch(
   () => props.id,
   (newValue) => {
-      loadTransaction(newValue)
-      categoriesStore.loadCategories()
-    }, 
-  { immediate: true}
+    loadTransaction(newValue)
+  },
+  { immediate: true }
 )
 
 let nextCallBack = null
@@ -134,20 +141,10 @@ onBeforeRouteLeave((to, from, next) => {
 
 
 <template>
-  <confirmation-dialog
-    ref="confirmationLeaveDialog"
-    confirmationBtn="Discard changes and leave"
-    msg="Do you really want to leave? You have unsaved changes!"
-    @confirmed="leaveConfirmed"
-  >
-  </confirmation-dialog>  
+  <confirmation-dialog ref="confirmationLeaveDialog" confirmationBtn="Discard changes and leave"
+    msg="Do you really want to leave? You have unsaved changes!" @confirmed="leaveConfirmed">
+  </confirmation-dialog>
 
-  <transaction-detail
-    :operationType="operation"
-    :transaction="transaction"
-    :categories="categoriesStore.categories"
-    :errors="errors"
-    @save="save"
-    @cancel="cancel"
-  ></transaction-detail>
+  <transaction-detail :operationType="operation" :transaction="transaction" :errors="errors" @save="save"
+    @cancel="cancel"></transaction-detail>
 </template>

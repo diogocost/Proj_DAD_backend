@@ -3,11 +3,13 @@ import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../../stores/user.js'
+import { useCategoriesStore } from '../../stores/categories.js'
 import { ref } from 'vue'
 
 const toast = useToast()
 const router = useRouter()
 const userStore = useUserStore()
+const categoriesStore = useCategoriesStore()
 
 const credentials = ref({
   username: '',
@@ -19,6 +21,7 @@ const emit = defineEmits(['login'])
 const login = async () => {
   if (await userStore.login(credentials.value)) {
     toast.success('User ' + userStore.user.name + ' has entered the application.')
+    categoriesStore.loadCategories()
     emit('login')
     router.back()
   } else {
