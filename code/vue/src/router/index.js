@@ -9,6 +9,7 @@ import Transaction from "../components/transactions/Transaction.vue"
 import Categories from "../components/categories/Categories.vue"
 import Category from "../components/categories/Category.vue"
 import Administrators from "../components/administrators/Administrators.vue"
+import Administrator from "../components/administrators/Administrator.vue"
 import Vcard from "../components/vcards/Vcard.vue"
 import Vcards from "../components/vcards/Vcards.vue"
 import Statistics from "../components/statistics/Statistics.vue"
@@ -98,6 +99,19 @@ const router = createRouter({
       component: Administrators,
     },
     {
+      path: '/administrators/new',
+      name: 'NewAdministrators',
+      component: Administrator,
+    },
+    {
+      path: '/administrators/:id',
+      name: 'Administrator',
+      component: Administrator,
+      //props: true
+      // Replaced with the following line to ensure that id is a number
+      props: route => ({ id: parseInt(route.params.id) })
+    },
+    {
       path: '/statistics',
       name: 'Statistics',
       component: Statistics,
@@ -110,6 +124,26 @@ router.beforeEach(async (to, from, next) => {
   if (handlingFirstRoute) {
     handlingFirstRoute = false
     await userStore.restoreToken()
+  }
+  if ((to.name == 'Login') || (to.name == 'home') || (to.name == 'NewVcard')) {
+    next()
+    return
+  }
+  if (!userStore.user) {
+    next({ name: 'Login' })
+    return
+  }
+  if (to.name == 'Administrators' || to.name == 'Administrator' || to.name == 'NewAdministrators' || to.name == 'Vcards') {
+    if (userStore.user.user_type != 'A') {
+      next({ name: 'home' })
+      return
+    }
+  }
+  if (to.name == 'Categories' || to.name == 'Transactions' || to.name == 'NewTransactions') {
+    if (userStore.user.user_type != 'V') {
+      next({ name: 'home' })
+      return
+    }
   }
   next()
 })

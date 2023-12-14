@@ -33,7 +33,7 @@ app.provide(
   })
 ) */
 
-const serverBaseUrl = 'http://laravel.test'
+const serverBaseUrl = 'http://127.0.0.1:8000'
 app.provide('serverBaseUrl', serverBaseUrl)  
 // Default Axios configuration
 axios.defaults.baseURL = serverBaseUrl + '/api'

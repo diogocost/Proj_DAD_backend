@@ -44,12 +44,7 @@ Route::middleware('auth:api')->group(function () {
 
         //Admin routes
         Route::get('admins/{admin}', [AdminController::class, 'show'])->middleware('can:view,admin');
-        Route::get('admins', [AdminController::class, 'index'])->middleware('can:viewAny,admin');   //NOT WORKING
+        Route::get('admins', [AdminController::class, 'index'])->middleware('can:viewAny,App\Models\Admin');
         Route::delete('admins/{admin}', [AdminController::class, 'destroy'])->middleware('can:delete,admin');
-
-        
-        
-
-
     }
 );
