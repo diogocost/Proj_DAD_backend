@@ -7,6 +7,14 @@ import { useUserStore } from '../../stores/user.js'
 
 const router = useRouter()
 const userStore = useUserStore()
+const filterType = ref('all')
+
+const filteredCategories = computed(() => {
+  if (filterType.value === 'all') {
+    return categories.value;
+  }
+  return categories.value.filter(category => category.type === filterType.value);
+});
 
 const loadCategories = async () => {
     const userId = userStore.userId
@@ -30,7 +38,7 @@ const editCategory = (category) => {
 const deletedCategory = (deletedCategory) => {
     let idx = categories.value.findIndex((c) => c.id === deletedCategory.id)
     if (idx >= 0) {
-        categories.value.splice(idx, 1)
+        categories.value.splice(idx, 1);
     }
 }
 
@@ -68,7 +76,7 @@ onMounted(() => {
         </div>
     </div>
     <hr>
-    <category-table :categories="categories" :showId="true" :showType="true" @edit="editCategory"
+    <category-table :categories="filteredCategories" :showId="true" :showType="true" @edit="editCategory"
         @deleted="deletedCategory"></category-table>
 </template>
 
