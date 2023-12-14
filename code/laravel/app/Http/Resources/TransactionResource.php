@@ -24,6 +24,8 @@ class TransactionResource extends JsonResource
             'new_balance' => $this->new_balance,
             'payment_type' => $this->payment_type,
             'payment_reference' => $this->payment_reference,
+            'vcard' => $this->vcard,
+            'pair_vcard' => $this->pair_vcard,
             'category_id' => $this->category_id,
             'category_name' => $this->category ? $this->category->name : '-- No Category --',
             'description' => $this->description,

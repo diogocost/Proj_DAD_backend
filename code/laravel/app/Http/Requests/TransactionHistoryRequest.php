@@ -24,17 +24,17 @@ class TransactionHistoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'start_date' => ['sometimes', 'date'],
-            'end_date' => ['sometimes', 'date', 'after_or_equal:start_date'],
-            'transaction_type' => ['sometimes', 'in:D,C'],
+            'start_date' => ['date'],
+            'end_date' => ['date', 'after_or_equal:start_date'],
+            'transaction_type' => ['in:D,C'],
             'category_id' => [
                 'sometimes',
                 'integer',
             ],
-            'pair_vcard' => ['sometimes', 'exists:vcards,phone_number'],
-            'payment_type' => ['sometimes', 'in:IBAN,VCARD,MBWAY,PAYPAL,MB,VISA'],
-            'min_value' => ['sometimes', 'numeric', 'min:0.01'],
-            'max_value' => ['sometimes', 'numeric', 'min:0.01', 'gte:min_value'],
+            'pair_vcard' => ['exists:vcards,phone_number'],
+            'payment_type' => ['in:IBAN,VCARD,MBWAY,PAYPAL,MB,VISA'],
+            'min_value' => ['numeric', 'min:0'],
+            'max_value' => ['numeric', 'gte:min_value'],
         ];
     }
 }

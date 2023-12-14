@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use App\Http\Requests\UpdateTransactionRequest;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
 
 class TransactionController extends Controller
 {
@@ -36,9 +38,9 @@ class TransactionController extends Controller
 
             if ($request->has('category_id')) {
                 $categoryFilter = $request->input('category_id');
-                if($categoryFilter > 0){
+                if ($categoryFilter > 0) {
                     $query->where('category_id', $request->input('category_id'));
-                }else{
+                } else {
                     $query->whereNull('category_id');
                 }
             }
@@ -77,20 +79,20 @@ class TransactionController extends Controller
     public function handleVcardTransaction(CreateTransactionRequest $request, Vcard $vcard)
     {
 
-        $receiver = Vcard::find($request->payment_reference);
+        $receiver = Vcard::find($request->pair_vcard);
         if ($receiver->blocked == 1) {
             return response()->json(['message' => 'Receiver is blocked'], 403);
         }
         $date = date('Y-m-d');
-        $datetime = date('Y-m-d H:i:s');
+        $datetime = date('Y-m-d H:i:s'); // Add a debugging statement to check the value of $date
         $transaction = new Transaction();
         $transaction->vcard = $vcard->phone_number;
-        $transaction->pair_vcard = $request->payment_reference;
+        $transaction->pair_vcard = $request->pair_vcard;
         $transaction->value = $request->value;
         $transaction->category_id = $request->category_id;
         $transaction->description = $request->description;
         $transaction->payment_type = $request->payment_type;
-        $transaction->payment_reference = $request->payment_reference;
+        $transaction->payment_reference = $request->pair_vcard;
         $transaction->old_balance = $vcard->balance;
         $transaction->new_balance = $vcard->balance - $request->value;
         $transaction->type = 'D';
@@ -101,11 +103,9 @@ class TransactionController extends Controller
 
         $pair_transaction = new Transaction(
             [
-                'vcard' => $request->payment_reference,
+                'vcard' => $request->pair_vcard,
                 'pair_vcard' => $vcard->phone_number,
                 'value' => $request->value,
-                'category_id' => $request->category_id,
-                'description' => $request->description,
                 'payment_type' => $request->payment_type,
                 'payment_reference' => $vcard->phone_number,
                 'old_balance' => $receiver->balance,
@@ -129,24 +129,23 @@ class TransactionController extends Controller
 
     public function handleNotVcardTransaction(CreateTransactionRequest $request, Vcard $vcard, bool $isAdmin)
     {
+        // Create the transaction
         $transaction = new Transaction();
         $transaction->vcard = $vcard->phone_number;
-        $transaction->type = $isAdmin ? 'C': 'D';
+        $transaction->type = 'C';
         $transaction->value = $request->value;
-        $transaction->category_id = $request->category_id ?? null;
-        $transaction->description = $request->description ?? null;
         $transaction->payment_type = $request->payment_type;
         $transaction->payment_reference = $request->payment_reference;
         $transaction->old_balance = $vcard->balance;
-        $transaction->new_balance = $isAdmin ?$vcard->balance + $request->value : $vcard->balance - $request->value;
+        $transaction->new_balance = $vcard->balance + $request->value;
         $transaction->date = date('Y-m-d');
         $transaction->datetime = date('Y-m-d H:i:s');
         $transaction->save();
-        if($isAdmin){
-            $vcard->balance += $request->value;
-        }else{
-            $vcard->balance -= $request->value;
-        }
+
+
+        // Update the vcard balance
+        $vcard->balance += $request->value;
+        $vcard->save();
         return new TransactionResource($transaction);
     }
 
@@ -155,9 +154,9 @@ class TransactionController extends Controller
         try {
             $user = Auth::guard('api')->user();
             $isAdmin = $user->isAdmin();
-            if($isAdmin){
+            if ($isAdmin) {
                 $vcard = Vcard::find($request->vcard);
-            }else{
+            } else {
                 $vcard = Vcard::find($user->id);
             }
 
@@ -181,9 +180,9 @@ class TransactionController extends Controller
                 ];
 
                 // Make a request to the external payment gateway service
-                if($isAdmin){
+                if ($isAdmin) {
                     $response = Http::post('https://dad-202324-payments-api.vercel.app/api/debit', $paymentGatewayPayload);
-                }else{
+                } else {
                     $response = Http::post('https://dad-202324-payments-api.vercel.app/api/credit', $paymentGatewayPayload);
                 }
 

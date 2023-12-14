@@ -9,7 +9,7 @@ export const useUserStore = defineStore('user', () => {
     const user = ref(null)
     const userName = computed(() => user.value?.name ?? 'Anonymous')
     const userId = computed(() => user.value?.id ?? -1)
-    const userIsAdmin = computed(() => user.value?.type === 'A')
+    const userIsAdmin = computed(() => user.value?.user_type == 'A')
 
     const userPhotoUrl = computed(() =>
         user.value?.photo_url
@@ -20,6 +20,8 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await axios.get('users/me')
             user.value = response.data.data
+            console.log(user.value)
+            console.log(userIsAdmin)
         } catch (error) {
             clearUser()
             throw error
@@ -66,5 +68,5 @@ export const useUserStore = defineStore('user', () => {
         return false
     }
 
-    return { user,userId, userName, userPhotoUrl, loadUser, clearUser, login, logout, restoreToken }
+    return { user, userId, userIsAdmin, userName, userPhotoUrl, loadUser, clearUser, login, logout, restoreToken }
 })

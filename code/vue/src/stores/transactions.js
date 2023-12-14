@@ -23,20 +23,17 @@ export const useTransactionsStore = defineStore('transactions', () => {
 
     async function loadTransactions(filters) {
         try {
-            const params = filters; // Create a copy of filterParams
-        
-            // Iterate through the filters and delete the ones with empty values
-            Object.keys(params).forEach(key => {
-              if (params[key] === '') {
-                delete params[key];
-              }
-            });
-        
-            const response = await axios.get(`vcards/${userStore.userId}/transactions`, {
-              params
-            });
+            const params = { ...filters };; // Create a copy of filterParams
 
+            for (const key in params) {
+                if (params[key] === null || params[key] === undefined || params[key] === '') {
+                    delete params[key]
+                }
+            }
+
+            const response = await axios.get(`vcards/${userStore.userId}/transactions`, { params });
             transactions.value = response.data.data
+
             return transactions.value
         } catch (error) {
             clearTransactions()
@@ -47,10 +44,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
     async function insertTransaction(newTransaction) {
         // Note that when an error occours, the exception should be
         // catch by the function that called the insertTransaction
-        const response = await axios.post('transactions', newTransaction)
+        const response = await axios.post('transactions/', newTransaction)
         transactions.value.push(response.data.data)
-
-        socket.emit('newTransaction', response.data.data);
 
         return response.data.data
     }

@@ -37,14 +37,15 @@ class CreateTransactionRequest extends FormRequest
 
         $rules = [
             'value' => ['required', 'numeric', 'min:0.01'],
-            'payment_reference' => $paymentTypeRules[$this->input('payment_type')],
         ];
 
         if($isAdmin){
             $rules['vcard'] = ['required', 'exists:vcards,phone_number'];
+            $rules['payment_reference'] =  $paymentTypeRules[$this->input('payment_type')];
             $rules['payment_type'] = ['required', 'in:IBAN,MBWAY,PAYPAL,MB,VISA'];
         } else {
-            $rules['payment_type'] = ['required', 'in:IBAN,VCARD,MBWAY,PAYPAL,MB,VISA'];
+            $rules['pair_vcard'] =  ['required', 'exists:vcards,phone_number'];
+            $rules['payment_type'] = ['required', 'in:VCARD'];
             $rules['category_id'] = ['nullable', 'exists:categories,id'];
             $rules['description'] = ['nullable', 'string'];
         }

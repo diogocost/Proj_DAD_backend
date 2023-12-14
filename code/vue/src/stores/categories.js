@@ -13,6 +13,10 @@ export const useCategoriesStore = defineStore('categories', () => {
 
     const categories = ref([])
 
+    const categoriesDebit = ref([])
+
+    const categoriesCredit = ref([])
+
     const totalCategories = computed(() => {
         return categories.value.length
     })
@@ -25,6 +29,10 @@ export const useCategoriesStore = defineStore('categories', () => {
         try {
             const response = await axios.get(`vcards/${userStore.userId}/categories`);
             categories.value = response.data.data
+
+            categoriesDebit.value = categories.value.filter((c) => c.type === 'D')
+            categoriesCredit.value = categories.value.filter((c) => c.type === 'C')
+
             return categories.value
         } catch (error) {
             clearCategories()
@@ -67,6 +75,8 @@ export const useCategoriesStore = defineStore('categories', () => {
 
     return {
         categories,
+        categoriesDebit,
+        categoriesCredit,
         totalCategories,
         loadCategories,
         clearCategories,
