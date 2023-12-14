@@ -17,18 +17,36 @@ class VcardPolicy
         return $vcard->phone_number == $user->id;
     }
 
-    public function viewTransactions(User $user, Vcard $vcard)
+    public function viewAny(User $user)
     {
-        return $vcard->phone_number == $user->id;
+        return $user->isAdmin();
     }
 
+   
     public function view(User $user, Vcard $vcard)
     {
-        return $vcard->phone_number == $user->id || $user->user_type == "A";
+        return $vcard->phone_number == $user->id || $user->isAdmin();
     }
 
-    public function delete(User $user, Vcard $vcard)
+    public function destroy(User $user)
     {
-        return $vcard->phone_number == $user->id && $vcard->balance == 0;
+        return $user->user_type == "A";
     }
+    
+
+    public function manageVcard(User $user, Vcard $vcard)
+    {
+        // Define your logic to determine if the user can manage the vcard
+        return $user->isAdmin();
+    }
+    
+
+
+
+    public function showAll(User $user)
+    {
+        return $user->isAdmin();
+    }
+    
 }
+

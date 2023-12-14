@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
 use App\Models\Vcard;
+use App\Models\User;
+
 use App\Http\Requests\CreateTransactionRequest;
 use App\Http\Requests\TransactionHistoryRequest;
 use Illuminate\Support\Facades\Auth;
