@@ -89,11 +89,17 @@ setTimeout(() => {
 }, 1000); // Simulating a delay of 2 seconds
 </script>
 
+
+
+
 <template>
   <ag-grid-vue style="width: 100%; height: 100%;" :rowHeight="45" class="ag-theme-quartz" :columnDefs="columns"
     :rowData="editingTransactions" :paginationAutoPageSize="true" :pagination="true">
   </ag-grid-vue>
 </template>
+
+
+
 
 <style scoped>
 .completed {

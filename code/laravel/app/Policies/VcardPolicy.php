@@ -27,8 +27,20 @@ class VcardPolicy
         return $vcard->phone_number == $user->id || $user->user_type == "A";
     }
 
-    public function delete(User $user, Vcard $vcard)
+    public function destroy(User $user, Vcard $vcard)
     {
-        return $vcard->phone_number == $user->id && $vcard->balance == 0;
+        return ($vcard->phone_number == $user->id || $user->isAdmin()) && $vcard->balance == 0;
+    }
+
+    public function manageVcard(User $user, Vcard $vcard)
+    {
+
+        return $user->isAdmin() ;
+    }
+
+    public function viewAny(User $user)
+    {
+
+        return $user->isAdmin();
     }
 }
