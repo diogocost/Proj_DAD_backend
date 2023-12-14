@@ -3,7 +3,6 @@ import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { ref, watch, computed, onMounted } from 'vue'
-
 import AdministratorDetail from "./AdministratorDetail.vue"
 
 const toast = useToast()
@@ -38,7 +37,7 @@ const loadAdministrator = async (id) => {
         console.log(error)
       }
   }
-}
+} 
 
 const save = async () => {
   errors.value = null
@@ -55,21 +54,6 @@ const save = async () => {
         toast.error('Administrator was not created due to validation errors!')
       } else {
         toast.error('Administrator was not created due to unknown server error!')
-      }
-    }
-  } else {
-    try {
-      const response = await axios.put('admins/' + props.id, administrator.value)
-      administrator.value = response.data.data
-      originalValueStr = JSON.stringify(administrator.value)
-      toast.success('Administrator #' + administrator.value.id + ' was updated successfully.')
-      router.back()
-    } catch (error) {
-      if (error.response.status == 422) {
-        errors.value = error.response.data.errors
-        toast.error('Administrator #' + props.id + ' was not updated due to validation errors!')
-      } else {
-        toast.error('Administrator #' + props.id + ' was not updated due to unknown server error!')
       }
     }
   }

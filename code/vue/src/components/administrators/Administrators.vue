@@ -5,6 +5,16 @@ import { ref, computed, onMounted } from 'vue'
 import AdministratorTable from "./AdministratorTable.vue"
 
 const router = useRouter()
+const searchQuery = ref('') // Reactive property for search query
+
+const filteredAdministrators = computed(() => {
+    if (!searchQuery.value) {
+        return administrators.value;
+    }
+    return administrators.value.filter(admin =>
+        admin.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    );
+});
 
 const loadAdministrators = async () => {
     try {
@@ -17,10 +27,6 @@ const loadAdministrators = async () => {
 
 const addAdministrator = () => {
     router.push({ name: 'NewAdministrators' })
-}
-
-const editAdministrator = (administrator) => {
-    router.push({ name: 'Administrator', params: { id: administrator.id } })
 }
 
 
@@ -56,6 +62,9 @@ onMounted(() => {
                     class="bi bi-xs bi-plus-circle"></i>&nbsp; Add Administrator</button>
         </div>
     </div>
+    <div class="mx-2 mt-2">
+        <input type="text" v-model="searchQuery" placeholder="Search administrators" class="form-control" />
+    </div>
     <div class="d-flex justify-content-between">
         <div class="mx-2">
             <h3 class="mt-4">{{ administratorsTitle }}</h3>
@@ -65,7 +74,7 @@ onMounted(() => {
         </div>
     </div>
     <hr>
-    <administrator-table :administrators="administrators" :showId="true" :showEmail="true" @edit="editAdministrator"
+    <administrator-table :administrators="filteredAdministrators" :showId="true" :showEmail="true"
         @deleted="deletedAdministrator"></administrator-table>
 </template>
 
@@ -80,6 +89,6 @@ onMounted(() => {
 }
 
 .btn-addtask {
-    margin-top: 1.85rem;
+    margin-top: 1.3rem;
 }
 </style>

@@ -18,10 +18,6 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  showEditButton: {
-    type: Boolean,
-    default: true,
-  },
   showDeleteButton: {
     type: Boolean,
     default: true,
@@ -54,10 +50,6 @@ watch(
         console.log(error)
     }
 } */
-
-const editClick = (administrator) => {
-    emit("edit", administrator)
-}
 
 const deleteClick = (administrator) => {
     administratorToDelete.value = administrator
@@ -103,12 +95,8 @@ const administratorToDeleteName = computed(() => administratorToDelete.value
                     <span>{{ administrator.name }}</span>
                 </td>
                 <td v-if="showEmail">{{ administrator.username }}</td>
-                <td class="text-end" v-if="showEditButton || showDeleteButton">
+                <td class="text-end" v-if="showDeleteButton">
                     <div class="d-flex justify-content-end">
-                        <button class="btn btn-xs btn-light" @click.prevent="editClick(administrator)" v-if="showEditButton">
-                            <i class="bi bi-xs bi-pencil"></i>
-                        </button>
-
                         <button class="btn btn-xs btn-light" @click.prevent="deleteClick(administrator)" v-if="showDeleteButton">
                             <i class="bi bi-xs bi-x-square-fill"></i>
                         </button>

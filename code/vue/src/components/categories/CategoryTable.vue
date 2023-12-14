@@ -2,31 +2,78 @@
 import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { ref, watch, computed } from "vue"
+import "ag-grid-community/styles//ag-grid.css";
+import "ag-grid-community/styles//ag-theme-quartz.css";
+import { AgGridVue } from "ag-grid-vue3";
 
 const toast = useToast()
 
+const gridOptions = ref({
+    pagination: true,
+    paginationPageSize: 10, // Set the number of rows per page
+    rowSelection: 'single', // Set the row selection type if needed
+    // Add other grid options as needed
+    domLayout: 'autoHeight',
+    suppressHorizontalScroll: false,
+});
+
+const onGridReady = (params) => {
+  gridOptions.value.api = params.api;
+}
+
 const props = defineProps({
-  categories: {
-    type: Array,
-    default: () => [],
-  },
-  showId: {
-    type: Boolean,
-    default: true,
-  },
-  showType: {
-    type: Boolean,
-    default: true,
-  },
-  showEditButton: {
-    type: Boolean,
-    default: true,
-  },
-  showDeleteButton: {
-    type: Boolean,
-    default: true,
-  },
+    categories: {
+        type: Array,
+        default: () => [],
+    },
+    showId: {
+        type: Boolean,
+        default: true,
+    },
+    showType: {
+        type: Boolean,
+        default: true,
+    },
+    showEditButton: {
+        type: Boolean,
+        default: true,
+    },
+    showDeleteButton: {
+        type: Boolean,
+        default: true,
+    },
 })
+
+const columns = ref([
+    { headerName: 'ID', field: 'id', flex: 1, sortable: true, filter: 'agNumberColumnFilter' },
+    { headerName: 'Name', field: 'name', flex: 1, sortable: true, filter: 'agTextColumnFilter' },
+    { headerName: 'Type', field: 'type',cellRenderer: params => params.value === 'D' ? 'Debit' : 'Credit', flex: 1,sortable: true, filter: 'agTextColumnFilter' },
+    { headerName: 'Edit', field: 'edit', sortable: false, cellRenderer: function (params) {
+      // Custom rendering for the Actions column
+      const button = document.createElement('button');
+      button.innerHTML = '<i class="bi bi-xs bi-pencil"></i>';
+      button.className = 'btn btn-sm btn-light';
+      button.addEventListener('click', () => editClick(params.data)); // Call your editClick function
+
+      const div = document.createElement('div');
+      div.appendChild(button);
+
+      return div;
+    } },
+    { headerName: 'Delete', field: 'delete', sortable: false, cellRenderer: function (params) {
+      // Custom rendering for the Actions column
+      const button = document.createElement('button');
+      button.innerHTML = '<i class="bi bi-xs bi-x-square-fill"></i>';
+      button.className = 'btn btn-sm btn-light';
+      button.addEventListener('click', () => deleteClick(params.data)); // Call your editClick function
+
+      const div = document.createElement('div');
+      div.appendChild(button);
+
+      return div;
+    } },
+]);
+
 const emit = defineEmits(["edit", "deleted"])
 
 const editingCategories = ref(props.categories)
@@ -34,10 +81,10 @@ const categoryToDelete = ref(null)
 const deleteConfirmationDialog = ref(null)
 
 watch(
-  () => props.categories,
-  (newCategories) => {
-    editingCategories.value = newCategories
-  }
+    () => props.categories,
+    (newCategories) => {
+        editingCategories.value = newCategories
+    }
 )
 
 // Alternative to previous watch
@@ -70,6 +117,7 @@ const deleteCategoryConfirmed = async () => {
         let deletedCategory = response.data.data
         toast.info(`Category ${categoryToDeleteName.value} was deleted`)
         emit("deleted", deletedCategory)
+        gridOptions.value.api.setRowData(editingCategories.value)
     } catch (error) {
         console.log(error)
         toast.error(`It was not possible to delete Category ${categoryToDeleteName.value}!`)
@@ -86,37 +134,9 @@ const categoryToDeleteName = computed(() => categoryToDelete.value
     <confirmation-dialog ref="deleteConfirmationDialog" confirmationBtn="Delete Category"
         :msg="`Do you really want to delete the Category ${categoryToDeleteName}?`" @confirmed="deleteCategoryConfirmed">
     </confirmation-dialog>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th v-if="showId">#</th>
-                <th>Name</th>
-                <th v-if="showType">Type</th>
-                <th v-if="showEditButton || showDeleteButton"></th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="category in editingCategories" :key="category.id">
-                <td v-if="showId">{{ category.id }}</td>
-                <td>
-                    <span>{{ category.name }}</span>
-                </td>
-                <td v-if="showType">{{ category.type === 'D' ? 'Debit' : category.type === 'C' ? 'Credit' : '' }}</td>
-                <td class="text-end" v-if="showEditButton || showDeleteButton">
-                    <div class="d-flex justify-content-end">
-                        <button class="btn btn-xs btn-light" @click.prevent="editClick(category)" v-if="showEditButton">
-                            <i class="bi bi-xs bi-pencil"></i>
-                        </button>
-
-                        <button class="btn btn-xs btn-light" @click.prevent="deleteClick(category)" v-if="showDeleteButton">
-                            <i class="bi bi-xs bi-x-square-fill"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <ag-grid-vue style="width: 100%;" class="ag-theme-quartz" :columnDefs="columns"
+        :rowData="editingCategories" :gridOptions="gridOptions" @grid-ready="onGridReady">
+    </ag-grid-vue>
 </template>
 
 <style scoped>

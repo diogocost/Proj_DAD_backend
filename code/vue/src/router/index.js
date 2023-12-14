@@ -110,14 +110,6 @@ const router = createRouter({
       component: Administrator,
     },
     {
-      path: '/administrators/:id',
-      name: 'Administrator',
-      component: Administrator,
-      //props: true
-      // Replaced with the following line to ensure that id is a number
-      props: route => ({ id: parseInt(route.params.id) })
-    },
-    {
       path: '/statistics',
       name: 'Statistics',
       component: Statistics,
