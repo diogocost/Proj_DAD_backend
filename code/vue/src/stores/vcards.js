@@ -15,24 +15,33 @@ export const useVcardsStore = defineStore('vcards', () => {
 
   async function fetchVcards(filters) {
     try {
-      const filterParams = filters
-
-      Object.keys(filterParams).forEach((key) => {
+      const filterParams = { ...filters };
+      for (const key in filterParams) {
         if (filterParams[key] === '') {
-          delete filterParams[key]
+          delete filterParams[key];
+        } else if (key === 'blocked') {
+          // Convert 'true'/'false' strings to 1/0 for the backend
+          if (key === 'blocked' && filterParams[key] !== '') {
+            // Convert 'true'/'false' strings to 1/0 for the backend
+            filterParams[key] = filterParams[key] === 'true' ? 1 : filterParams[key] === 'false' ? 0 : filterParams[key];
+          }
         }
-      })
-      const response = await axios.get('vcards', { filterParams })
-      console.log('API response:', response.data)
-      console.log('filterParams:', filterParams)
-
-      vcards.value = response.data.data
-      return vcards.value
+      }
+    
+      // Ensure correct structure for Axios request
+      const response = await axios.get('http://laravel.test/api/vcards', { params: filterParams });
+      vcards.value = response.data.data;
+      console.log('API response:', response.data);
+      console.log('filterParams:', filterParams);
+      
+      return vcards.value;
     } catch (error) {
-      console.error(error)
-      toast.error('Failed to fetch vCards')
+      console.error(error);
+      toast.error('Failed to fetch vCards');
     }
   }
+
+
 
   async function manageVcard(vcardId, actionType, actionData = {}) {
     try {

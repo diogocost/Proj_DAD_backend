@@ -12,7 +12,7 @@
 <script setup>
 
 
-import { ref, defineProps, defineEmits} from "vue"
+import { ref} from "vue"
 import "ag-grid-community/styles//ag-grid.css";
 import "ag-grid-community/styles//ag-theme-quartz.css";
 import { AgGridVue } from "ag-grid-vue3";
@@ -21,7 +21,7 @@ const props = defineProps({
   vcards: Array
 });
 
-const emit = defineEmits(['delete', 'block', 'unblock', 'changeMaxDebit']);
+const emit = defineEmits(['delete', 'block', 'unblock', 'changeMaxDebit', 'blockUnblock']);
 
 const columns = ref([
   { headerName: 'Phone Number', field: 'phone_number', sortable: true },
@@ -36,30 +36,29 @@ const columns = ref([
     cellRenderer: function(params) {
       // Create container
       const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'button-cell';
+
+      // Block/Unblock button with toggle icon
+      const blockUnblockButton = document.createElement('button');
+      blockUnblockButton.innerHTML = params.data.blocked ? '<i class="bi bi-unlock"></i>' : '<i class="bi bi-lock"></i>';
+      blockUnblockButton.className = 'btn btn-sm action-button';
+      blockUnblockButton.addEventListener('click', () => emitBlockUnblock(params.data));
+      actionsDiv.appendChild(blockUnblockButton);
+
+      // Change max debit button
+      const changeDebitButton = document.createElement('button');
+      changeDebitButton.innerHTML = '<i class="bi bi-credit-card"></i>';
+      changeDebitButton.className = 'btn btn-sm action-button';
+      changeDebitButton.addEventListener('click', () => emitChangeMaxDebit(params.data));
+      actionsDiv.appendChild(changeDebitButton);
 
       // Delete button
       const deleteButton = document.createElement('button');
-      deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
-      deleteButton.className = 'btn btn-sm btn-danger';
+      deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
+      deleteButton.className = 'btn btn-sm action-button';
       deleteButton.addEventListener('click', () => emitDelete(params.data));
       actionsDiv.appendChild(deleteButton);
 
-      // Block/Unblock button
-      const toggleButton = document.createElement('button');
-      toggleButton.className = `btn btn-sm ${params.data.blocked ? 'btn-warning' : 'btn-success'}`;
-      toggleButton.innerHTML = params.data.blocked ? '<i class="fa fa-unlock"></i>' : '<i class="fa fa-lock"></i>';
-      toggleButton.addEventListener('click', () => emitBlockUnblock(params.data.blocked ? 'unblock' : 'block', params.data));
-      actionsDiv.appendChild(toggleButton);
-
-      // Change max debit button
-       // Change max debit button
-       const changeDebitButton = document.createElement('button');
-      changeDebitButton.innerHTML = '<i class="fa fa-credit-card"></i>';
-      changeDebitButton.className = 'btn btn-sm btn-primary';
-      changeDebitButton.addEventListener('click', () => emitChangeMaxDebit('changeMaxDebit', params.data));
-      actionsDiv.appendChild(changeDebitButton);
-
-      // Return the complete div with all buttons
       return actionsDiv;
     },
     editable: false,
@@ -72,16 +71,18 @@ function emitDelete(vcard) {
   emit('delete', vcard);
 }
 
-function emitBlockUnblock(action, vcard) {
-  // Construct the payload for blocking/unblocking the vcard
-  const payload = {
-    blocked: action === 'block',
-  };
+// Inside your Vue component script
 
-  // Emit the block/unblock event with vcard ID and the payload
-  emit('blockUnblock', { vcardId: vcard.id, payload });
-  console.log(`${action} vcard clicked:`, vcard);
+function emitBlockUnblock(vcard) {
+  const actionType = vcard.blocked ? 'unblock' : 'block';
+  const payload = {
+    vcardId: vcard.id,  // Make sure you have the correct vcard ID here
+    blocked: actionType === 'block',
+  };
+  emit('blockUnblock', payload); // This should match the name in your emits option
+  console.log(`${actionType} vcard clicked:`, vcard);
 }
+
 
 function emitChangeMaxDebit(action, vcard) {
   // Prompt the user to enter a new max debit value

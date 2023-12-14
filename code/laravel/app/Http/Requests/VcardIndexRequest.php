@@ -22,7 +22,8 @@ class VcardIndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'blocked' => ['sometimes', 'boolean'],
+            'blocked' => ['sometimes', 'in:0,1'],
+
             'min_balance' => ['sometimes', 'numeric', 'min:0'],
             'max_balance' => ['sometimes', 'numeric', 'min:0', 'gte:min_balance'],
             'created_at_start' => ['sometimes', 'date'],

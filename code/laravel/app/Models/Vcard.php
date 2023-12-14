@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Category;
+use App\Models\DefaultCategory;
+use App\Models\Transaction;
+use App\Models\User;
+
 
 class Vcard extends Model
 {
@@ -53,7 +58,7 @@ class Vcard extends Model
     // Define the relationship to the Users model
     public function user()
     {
-        return $this->belongsTo(Users::class, 'user_type', 'user_type')->where('user_type', 'V');
+        return $this->belongsTo(User::class, 'user_type', 'user_type')->where('user_type', 'V');
     }
 
     public function categories()
