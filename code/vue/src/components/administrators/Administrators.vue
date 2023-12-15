@@ -47,7 +47,7 @@ const props = defineProps({
 const administrators = ref([])
 
 const totalAdministrators = computed(() => {
-    return administrators.value.length;
+    return filteredAdministrators.value.length;
 });
 
 onMounted(() => {
