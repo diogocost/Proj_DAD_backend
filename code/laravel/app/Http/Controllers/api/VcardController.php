@@ -121,12 +121,10 @@ class VcardController extends Controller
             if ($password != $vcard->password) {
                 $messages['password'] = 'The password field is incorrect!';
             }
-
             // Check if the confirmation code is provided and valid
             if ($confirmation_code != $vcard->confirmation_code) {
                 $messages['confirmation_code'] = 'The confirmation code field is incorrect!';
             }
-
             if (!empty($messages)) {
                 return response()->json(['messages' => $messages], 403);
             }

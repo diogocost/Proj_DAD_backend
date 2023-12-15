@@ -13,6 +13,7 @@ class TransactionPolicy
      */
     public function view(User $user, Transaction $transaction): bool
     {
+        
         return $user->id == $transaction->vcard;
     }
 

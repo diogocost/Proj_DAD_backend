@@ -3,80 +3,64 @@ import axios from 'axios'
 import { useToast } from "vue-toastification"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { ref, watch, computed, onMounted } from 'vue'
-
-import CategoryDetail from "./CategoryDetail.vue"
+import AdministratorDetail from "./AdministratorDetail.vue"
 
 const toast = useToast()
 const router = useRouter()
 
-const newCategory = () => {
+const newAdministrator = () => {
   return {
     id: null,
-    vcard: '',
-    type: '',
     name: '',
+    email:'',
+    password: '',
   }
 }
-const category = ref(newCategory())
+const administrator = ref(newAdministrator())
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
 // String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
   
-const loadCategory = async (id) => {
+const loadAdministrator = async (id) => {
   originalValueStr = ''
   errors.value = null
   if (!id || (id < 0)) {
-    category.value = newCategory()
-    originalValueStr = JSON.stringify(category.value)
+    administrator.value = newAdministrator()
+    originalValueStr = JSON.stringify(administrator.value)
   } else {
       try {
-        const response = await axios.get('categories/' + id)
-        category.value = response.data.data
-        originalValueStr = JSON.stringify(category.value)
+        const response = await axios.get('admins/' + id)
+        administrator.value = response.data.data
+        originalValueStr = JSON.stringify(administrator.value)
       } catch (error) {
         console.log(error)
       }
   }
-}
+} 
 
 const save = async () => {
   errors.value = null
   if (operation.value == 'insert') {
     try {
-      const response = await axios.post('categories', category.value)
-      category.value = response.data.data
-      originalValueStr = JSON.stringify(category.value)
-      toast.success('Category #' + category.value.id + ' was created successfully.')
+      const response = await axios.post('admins', administrator.value)
+      administrator.value = response.data.data
+      originalValueStr = JSON.stringify(administrator.value)
+      toast.success('Administrator #' + administrator.value.id + ' was created successfully.')
       router.back()
     } catch (error) {
       if (error.response.status == 422) {
         errors.value = error.response.data.errors
-        toast.error('Category was not created due to validation errors!')
+        toast.error('Administrator was not created due to validation errors!')
       } else {
-        toast.error('Category was not created due to unknown server error!')
-      }
-    }
-  } else {
-    try {
-      const response = await axios.put('categories/' + props.id, category.value)
-      category.value = response.data.data
-      originalValueStr = JSON.stringify(category.value)
-      toast.success('Category #' + category.value.id + ' was updated successfully.')
-      router.back()
-    } catch (error) {
-      if (error.response.status == 422) {
-        errors.value = error.response.data.errors
-        toast.error('Category #' + props.id + ' was not updated due to validation errors!')
-      } else {
-        toast.error('Category #' + props.id + ' was not updated due to unknown server error!')
+        toast.error('Administrator was not created due to unknown server error!')
       }
     }
   }
 }
 
 const cancel = () => {
-  originalValueStr = JSON.stringify(category.value)
+  originalValueStr = JSON.stringify(administrator.value)
   router.back()
 }
 
@@ -95,7 +79,7 @@ const operation = computed( () => (!props.id || props.id < 0) ? 'insert' : 'upda
 watch(
   () => props.id,
   (newValue) => {
-      loadCategory(newValue)
+      loadAdministrator(newValue)
     }, 
   { immediate: true}
 )
@@ -109,7 +93,7 @@ const leaveConfirmed = () => {
 
 onBeforeRouteLeave((to, from, next) => {
   nextCallBack = null
-  let newValueStr = JSON.stringify(category.value)
+  let newValueStr = JSON.stringify(administrator.value)
   if (originalValueStr != newValueStr) {
     // Some value has changed - only leave after confirmation
     nextCallBack = next
@@ -131,11 +115,11 @@ onBeforeRouteLeave((to, from, next) => {
   >
   </confirmation-dialog>  
 
-  <category-detail
+  <administrator-detail
     :operationType="operation"
-    :category="category"
+    :administrator="administrator"
     :errors="errors"
     @save="save"
     @cancel="cancel"
-  ></category-detail>
+  ></administrator-detail>
 </template>
