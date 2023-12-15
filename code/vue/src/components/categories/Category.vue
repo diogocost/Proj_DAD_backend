@@ -54,7 +54,7 @@ const save = async () => {
         errors.value = error.response.data.errors
         toast.error('Category was not created due to validation errors!')
       } else {
-        toast.error('Category was not created due to unknown server error!')
+        toast.error(error.response?.data?.message || 'Category was not created due to unknown server error!')
       }
     }
   } else {
@@ -69,7 +69,7 @@ const save = async () => {
         errors.value = error.response.data.errors
         toast.error('Category #' + props.id + ' was not updated due to validation errors!')
       } else {
-        toast.error('Category #' + props.id + ' was not updated due to unknown server error!')
+        toast.error(error.response?.data?.message || 'Category #' + props.id + 'was not created due to unknown server error!')
       }
     }
   }

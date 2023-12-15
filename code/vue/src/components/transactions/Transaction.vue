@@ -83,6 +83,7 @@ const save = async () => {
       toast.success('Transaction #' + transaction.value.id + ' was updated successfully.')
       router.back()
     } catch (error) {
+      console.log(error)
       if (error.response.status == 422) {
         errors.value = error.response.data.errors
         toast.error('Transaction #' + props.id + ' was not updated due to validation errors!')

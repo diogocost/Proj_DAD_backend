@@ -61,14 +61,13 @@ const save = async (userToSave) => {
       vcard.value = response.data.data
       originalValueStr = JSON.stringify(vcard.value)
       toast.success('Vcard ' + vcard.value.phone_number + ' was registered successfully.')
-      console.log(userToSave.phone_number)
-      console.log(userToSave.password)
       await userStore.login({
         username: userToSave.phone_number,
         password: userToSave.password
       })
       router.push({name: 'home'})
     } catch (error) {
+      console.log(error)
       if (error.response.status == 422) {
         errors.value = error.response.data.errors
         toast.error('Vcard was not registered due to validation errors!')
@@ -78,7 +77,7 @@ const save = async (userToSave) => {
     }
   } else {
     try {
-      const response = await axios.put('users/' + props.id, userToSave)
+      const response = await axios.put('users/me')
       vcard.value = response.data.data
       originalValueStr = JSON.stringify(vcard.value)
       toast.success('Vcard ' + vcard.value.id + ' was updated successfully.')

@@ -8,11 +8,13 @@ use App\Http\Controllers\api\UserController;
 use App\Http\Controllers\api\VcardController;
 use App\Http\Controllers\api\TransactionController;
 use App\Http\Controllers\api\AdminController;
+use App\Http\Controllers\api\DefaultCategoryController;
 
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [UserController::class, 'store'])->middleware('can:create,App\Models\User');
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:api')->group(
+    function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
 
         //User routes
@@ -23,13 +25,13 @@ Route::middleware('auth:api')->group(function () {
         //Vcard routes
         Route::patch('vcards/{vcard}/confirmation_code', [VcardController::class, 'updatesConfirmationCode'])->middleware('can:updateConfirmationCode,vcard');
         Route::get('vcards/{vcard}/categories', [CategoryController::class, 'getCetegoriesOfVcard'])->middleware('can:viewCategories,vcard');
-        Route::get('vcards/{vcard}/transactions', [TransactionController::class, 'getTransactionsOfVcard'])->middleware('can:viewTransactions,vcard');
-        Route::get('vcards', [VcardController::class, 'index'])->middleware('can:showAll,vcard');
+        Route::get('vcards/{vcard}/transactions', [TransactionController::class, 'getTransactionsOfVcard'])->middleware('can:viewCategories,vcard');
+        Route::get('vcards', [VcardController::class, 'index'])->middleware('can:showAll,App\Models\VCard');
 
         Route::get('vcards/{vcard}', [VcardController::class, 'show'])->middleware('can:view,vcard');
         Route::delete('vcards/{vcard}', [VcardController::class, 'destroy'])->middleware('can:destroy,App\Models\VCard');   // NOT working
         Route::patch('vcards/{vcard}', [VcardController::class, 'manageVcard'])->middleware('can:manageVcard,vcard');
-        
+
         //Category routes
         Route::get('categories/{category}', [CategoryController::class, 'show'])->middleware('can:view,category');
         Route::post('categories', [CategoryController::class, 'store'])->middleware('can:create,App\Models\Category');
@@ -39,11 +41,18 @@ Route::middleware('auth:api')->group(function () {
         //Transaction routes
         Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->middleware('can:view,transaction');
         Route::post('transactions', [TransactionController::class, 'store'])->middleware('can:create,App\Models\Transaction');
-        Route::patch('transactions/{transaction}', [TransactionController::class, 'update'])->middleware('can:update,App\Models\Transaction');
+        Route::patch('transactions/{transaction}', [TransactionController::class, 'update'])->middleware('can:update,transaction');
 
         //Admin routes
         Route::get('admins/{admin}', [AdminController::class, 'show'])->middleware('can:view,admin');
         Route::get('admins', [AdminController::class, 'index'])->middleware('can:viewAny,App\Models\Admin');   //working
         Route::delete('admins/{admin}', [AdminController::class, 'destroy'])->middleware('can:delete,admin');
+
+        //DefaultCategory routes
+        Route::get('default_categories', [DefaultCategoryController::class, 'index'])->middleware('can:viewAny,App\Models\DefaultCategory');
+        Route::get('default_categories/{defaultCategory}', [DefaultCategoryController::class, 'show'])->middleware('can:view,defaultCategory');
+        Route::post('default_categories', [DefaultCategoryController::class, 'store'])->middleware('can:create,App\Models\DefaultCategory');
+        Route::put('default_categories/{defaultCategory}', [DefaultCategoryController::class, 'update'])->middleware('can:update,defaultCategory');
+        Route::delete('default_categories/{defaultCategory}', [DefaultCategoryController::class, 'destroy'])->middleware('can:delete,defaultCategory');
     }
 );

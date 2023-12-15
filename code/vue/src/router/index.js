@@ -3,11 +3,15 @@ import { useUserStore } from "../stores/user.js"
 import HomeView from '../views/HomeView.vue'
 //import Dashboard from "../components/Dashboard.vue"
 import Login from "../components/auth/Login.vue"
+import User from "../components/users/User.vue"
 import ChangePassword from "../components/auth/ChangePassword.vue"
+import ChangeConfirmationCode from "../components/auth/ChangeConfirmationCode.vue"
 import Transactions from "../components/transactions/Transactions.vue"
 import Transaction from "../components/transactions/Transaction.vue"
 import Categories from "../components/categories/Categories.vue"
 import Category from "../components/categories/Category.vue"
+import DefaultCategories from "../components/default_categories/DefaultCategories.vue"
+import DefaultCategory from "../components/default_categories/DefaultCategory.vue"
 import Administrators from "../components/administrators/Administrators.vue"
 import Administrator from "../components/administrators/Administrator.vue"
 import Vcard from "../components/vcards/Vcard.vue"
@@ -45,6 +49,16 @@ const router = createRouter({
       path: '/password',
       name: 'ChangePassword',
       component: ChangePassword
+    },
+    {
+      path: '/confirmation_code',
+      name: 'ChangeConfirmationCode',
+      component: ChangeConfirmationCode
+    },
+    {
+      path: '/user',
+      name: 'User',
+      component: User
     },
     {
       path: '/vcards/new',
@@ -100,6 +114,23 @@ const router = createRouter({
       props: { id: -1 }
     },
     {
+      path: '/default_categories',
+      name: 'DefaultCategories',
+      component: DefaultCategories,
+    },
+    {
+      path: '/default_categories/:id',
+      name: 'DefaultCategory',
+      component: DefaultCategory,
+      props: route => ({ id: parseInt(route.params.id) })
+    },
+    {
+      path: '/default_categories/new',
+      name: 'NewDefaultCategory',
+      component: DefaultCategory,
+      props: { id: -1 }
+    },
+    {
       path: '/administrators',
       name: 'Administrators',
       component: Administrators,
@@ -131,13 +162,14 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'Login' })
     return
   }
-  if (to.name == 'Administrators' || to.name == 'Administrator' || to.name == 'NewAdministrators' || to.name == 'Vcards') {
+  if (to.name == 'Administrators' || to.name == 'Administrator' || to.name == 'NewAdministrators' || to.name == 'Vcards'
+      || to.name == 'DefaultCategories' || to.name == 'DefaultCategory' || to.name == 'NewDefaultCategory') {
     if (userStore.user.user_type != 'A') {
       next({ name: 'home' })
       return
     }
   }
-  if (to.name == 'Categories' || to.name == 'Transactions' || to.name == 'NewTransactions') {
+  if (to.name == 'Categories' || to.name == 'Transactions' || to.name == 'ChangeConfirmationCode' || to.name == 'Category' || to.name == 'NewCategory') {
     if (userStore.user.user_type != 'V') {
       next({ name: 'home' })
       return

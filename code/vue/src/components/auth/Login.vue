@@ -21,7 +21,6 @@ const emit = defineEmits(['login'])
 const login = async () => {
   if (await userStore.login(credentials.value)) {
     toast.success('User ' + userStore.user.name + ' has entered the application.')
-    categoriesStore.loadCategories()
     emit('login')
     router.back()
   } else {

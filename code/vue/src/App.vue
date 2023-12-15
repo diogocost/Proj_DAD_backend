@@ -73,8 +73,8 @@ const clickMenuOption = () => {
             <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
               <li>
                 <router-link class="dropdown-item"
-                  :class="{ active: $route.name == 'Vcard' && $route.params.id == userStore.userId }"
-                  :to="{ name: 'Vcard', params: { id: userStore.userId } }" @click="clickMenuOption">
+                  :class="{ active: $route.name == 'User' && $route.params.id == userStore.userId }"
+                  :to="{ name: 'User' }" @click="clickMenuOption">
                   <!-- userStore.userId -->
                   <i class="bi bi-person-square"></i>
                   Profile
@@ -85,6 +85,13 @@ const clickMenuOption = () => {
                   :to="{ name: 'ChangePassword' }" @click="clickMenuOption"> <!--  -->
                   <i class="bi bi-key-fill"></i>
                   Change password
+                </router-link>
+              </li>
+              <li v-if="!userStore.userIsAdmin">
+                <router-link class="dropdown-item" :class="{ active: $route.name === 'ChangeConfirmationCode' }"
+                  :to="{ name: 'ChangeConfirmationCode' }" @click="clickMenuOption"> <!--  -->
+                  <i class="bi bi-phone"></i>
+                  Change Confirmation Code
                 </router-link>
               </li>
               <li>
@@ -107,52 +114,52 @@ const clickMenuOption = () => {
         <div class="position-sticky pt-3">
           <ul class="nav flex-column"> <!-- v-if="userStore.user" -->
             <li class="nav-item">
-              <router-link class="nav-link" :class="{ active: $route.name === 'home' }" :to="{ name: 'home' }"
+              <router-link class="nav-link" :class="{ active: $route.name === 'home' }" :to="{ name: 'home' }" v-if="userStore.user"
                 @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-house"></i>
                 Dashboard
               </router-link>
             </li>
-            <li class="nav-item d-flex justify-content-between align-items-center pe-3">
+            <li class="nav-item d-flex justify-content-between align-items-center pe-3" v-if="!userStore.userIsAdmin && userStore.user">
               <router-link class="nav-link w-100 me-3" :class="{ active: $route.name === 'Transactions' }"
                 :to="{ name: 'Transactions' }" @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-list-check"></i>
                 Transactions
               </router-link>
-              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new transaction"
+              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new transaction" 
                 @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-xs bi-plus-circle"></i>
               </router-link>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-if="!userStore.userIsAdmin && userStore.user">
               <router-link class="nav-link" :class="{ active: $route.name === 'Categories' }" :to="{ name: 'Categories' }"
                 @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-files"></i>
                 Categories
               </router-link>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-if="userStore.userIsAdmin">
               <router-link class="nav-link" :class="{ active: $route.name === 'Administrators' }"
                 :to="{ name: 'Administrators' }" @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-files"></i>
                 ADM Manage Administrators
               </router-link>
             </li>
-            <li class="nav-item">
+            <li class="nav-item" v-if="userStore.userIsAdmin">
               <router-link class="nav-link" :class="{ active: $route.name === 'Vcards' }" :to="{ name: 'Vcards' }"
                 @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-files"></i>
                 ADM Manage Vcards
               </router-link>
             </li>
-            <li class="nav-item">
-              <router-link class="nav-link" :class="{ active: $route.name === 'Categories' }" :to="{ name: 'Categories' }"
+            <li class="nav-item" v-if="userStore.userIsAdmin">
+              <router-link class="nav-link" :class="{ active: $route.name === 'DefaultCategories' }" :to="{ name: 'DefaultCategories' }"
                 @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-files"></i>
                 ADM Default Categories List
               </router-link>
             </li>
-            <li class="nav-item"> <!-- v-show="userStore.user?.type == 'A'" -->
+            <li class="nav-item" v-if="userStore.userIsAdmin"> <!-- v-show="userStore.user?.type == 'A'" -->
               <router-link class="nav-link" :class="{ active: $route.name === 'Statistics' }" :to="{ name: 'Statistics' }"
                 @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-bar-chart-line"></i>

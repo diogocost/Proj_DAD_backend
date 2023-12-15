@@ -11,6 +11,7 @@ use App\Http\Requests\ManageVcardRequest;
 use App\Models\Vcard;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 use App\Http\Requests\VcardIndexRequest;
 
@@ -59,8 +60,12 @@ class VcardController extends Controller
         $password = bcrypt($request->current_password);
 
         // Check if the password is correct
-        if ($password != $vcard->password) {
-            return response()->json(['messages' => 'The password field is incorrect!'], 403);
+        if (!Hash::check($request->current_password, $vcard->password)) {
+            return response()->json([
+                'errors' => [
+                    'current_password' => ['The password field is incorrect!']
+                ]
+            ], 422);
         }
         
         try {

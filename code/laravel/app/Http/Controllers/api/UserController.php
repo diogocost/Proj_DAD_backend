@@ -16,6 +16,7 @@ use App\Http\Requests\UpdateUserPasswordRequest;
 use App\Http\Requests\UpdateUserRequest;
 use Illuminate\Support\Facades\Auth;
 
+
 class UserController extends Controller
 {
     public function show_me(Request $request)
@@ -65,11 +66,9 @@ class UserController extends Controller
     }
 
     public function update_password(UpdateUserPasswordRequest $request, User $user)
-    {   
-        $password = bcrypt($request->current_password);
-
+    {
         // Check if the password is correct
-        if ($password != $user->password) {
+        if (!Hash::check($request->current_password, $user->password)) {
             return response()->json(['messages' => 'The current password field is incorrect!'], 403);
         }
         

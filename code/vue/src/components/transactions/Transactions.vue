@@ -125,7 +125,8 @@ onMounted( async () => {
       <!-- Transaction Type Filter -->
       <div class="mx-2 mt-2 flex-grow-1 filter-div">
         <label for="selectType" class="form-label">Filter by Type:</label>
-        <select class="form-select" id="selectType" v-model="filterParams.transaction_type" :disabled="filterParams.category_id != '' && filterParams.category_id != '-1'">
+        <select class="form-select" id="selectType" v-model="filterParams.transaction_type" :disabled="filterParams.category_id != '' && filterParams.category_id != '-1'"
+        :class="{ 'is-invalid': errors ? errors['transaction_type'] : false }">
           <option value="">Any</option>
           <option value="D">Debit</option>
           <option value="C">Credit</option>
@@ -136,7 +137,7 @@ onMounted( async () => {
       <!-- Payment Type Filter -->
       <div class="mx-2 mt-2 flex-grow-1 filter-div">
         <label for="selectPaymentType" class="form-label">Filter by Payment Type:</label>
-        <select class="form-select" id="selectPaymentType" v-model="filterParams.payment_type">
+        <select class="form-select" id="selectPaymentType" v-model="filterParams.payment_type" :class="{ 'is-invalid': errors ? errors['payment_type'] : false }">
           <option value="">Any</option>
           <option value="VISA">Visa</option>
           <option value="VCARD">Vcard</option>
@@ -152,7 +153,7 @@ onMounted( async () => {
       <!-- Category Filter -->
       <div class="mx-2 mt-2 flex-grow-1 filter-div">
         <label for="selectCategory" class="form-label">Filter by Category:</label>
-        <select class="form-select" id="selectCategory" v-model="filterParams.category_id">
+        <select class="form-select" id="selectCategory" v-model="filterParams.category_id" :class="{ 'is-invalid': errors ? errors['category_id'] : false }">
           <option value="">Any</option>
           <option value="-1">-- No category --</option>
           <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
@@ -164,7 +165,7 @@ onMounted( async () => {
       <!-- Vcard Filter -->
       <div class="mx-2 mt-2 filter-div">
         <label for="selectVcard" class="form-label">Filter by Vcard:</label>
-        <input type="text" class="form-control" id="selectVcard" v-model="filterParams.pair_vcard" />
+        <input type="text" class="form-control" id="selectVcard" v-model="filterParams.pair_vcard" :class="{ 'is-invalid': errors ? errors['pair_vcard'] : false }"/>
         <field-error-message :errors="errors" fieldName="pair_vcard"></field-error-message>
       </div>
       <div class="mx-2 mt-2">
@@ -178,7 +179,7 @@ onMounted( async () => {
       <!-- Min Value Filter -->
       <div class="mx-2 mt-2 filter-div">
         <label for="filterByMinValue" class="form-label">Minimum Value:</label>
-        <input min="0" type="number" class="form-control" id="filterByMinValue" v-model="filterParams.min_value" />
+        <input min="0" type="number" class="form-control" id="filterByMinValue" v-model="filterParams.min_value" :class="{ 'is-invalid': errors ? errors['min_value'] : false }"/>
         <field-error-message :errors="errors" fieldName="min_value"></field-error-message>
       </div>
 
@@ -186,21 +187,21 @@ onMounted( async () => {
       <div class="mx-2 mt-2 filter-div">
         <label for="filterByMaxValue" class="form-label">Max Value:</label>
         <input :min="filterParams.min_value" type="number" class="form-control" id="filterByMaxValue"
-          v-model="filterParams.max_value" />
+          v-model="filterParams.max_value" :class="{ 'is-invalid': errors ? errors['max_value'] : false }"/>
         <field-error-message :errors="errors" fieldName="max_value"></field-error-message>
       </div>
 
       <!-- Start Date Filter -->
       <div class="mx-2 mt-2 flex-grow-1 filter-div">
         <label for="filterByStartDate" class="form-label">Filter by Start Date:</label>
-        <input type="date" class="form-control" id="filterByStartDate" v-model="filterParams.start_date" />
+        <input type="date" class="form-control" id="filterByStartDate" v-model="filterParams.start_date" :class="{ 'is-invalid': errors ? errors['start_date'] : false }"/>
         <field-error-message :errors="errors" fieldName="start_date"></field-error-message>
       </div>
 
       <!-- End Date Filter -->
       <div class="mx-2 mt-2 flex-grow-1 filter-div">
         <label for="filterByEndDate" class="form-label">Filter by End Date:</label>
-        <input type="date" class="form-control" id="filterByEndDate" v-model="filterParams.end_date" />
+        <input type="date" class="form-control" id="filterByEndDate" v-model="filterParams.end_date" :class="{ 'is-invalid': errors ? errors['end_date'] : false }"/>
         <field-error-message :errors="errors" fieldName="end_date"></field-error-message>
       </div>
 
