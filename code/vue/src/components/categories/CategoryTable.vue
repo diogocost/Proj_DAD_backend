@@ -48,7 +48,7 @@ const columns = ref([
     { headerName: 'ID', field: 'id', flex: 1, sortable: true, filter: 'agNumberColumnFilter' },
     { headerName: 'Name', field: 'name', flex: 1, sortable: true, filter: 'agTextColumnFilter' },
     { headerName: 'Type', field: 'type',cellRenderer: params => params.value === 'D' ? 'Debit' : 'Credit', flex: 1,sortable: true, filter: 'agTextColumnFilter' },
-    { headerName: 'Edit', field: 'edit', sortable: false, cellRenderer: function (params) {
+    { headerName: 'Edit', field: 'edit',width: 60, sortable: false, cellRenderer: function (params) {
       // Custom rendering for the Actions column
       const button = document.createElement('button');
       button.innerHTML = '<i class="bi bi-xs bi-pencil"></i>';
@@ -60,7 +60,7 @@ const columns = ref([
 
       return div;
     } },
-    { headerName: 'Delete', field: 'delete', sortable: false, cellRenderer: function (params) {
+    { headerName: 'Delete', field: 'delete',width: 75, sortable: false, cellRenderer: function (params) {
       // Custom rendering for the Actions column
       const button = document.createElement('button');
       button.innerHTML = '<i class="bi bi-xs bi-x-square-fill"></i>';
