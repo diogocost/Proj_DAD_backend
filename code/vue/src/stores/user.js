@@ -14,6 +14,7 @@ export const useUserStore = defineStore('user', () => {
     const userIsAdmin = computed(() => user.value?.user_type == 'A')
     const categoriesStore = useCategoriesStore()
     const defaultCategoriesStore = useDefaultCategoriesStore() 
+    const socket = inject('socket')
 
     const userPhotoUrl = computed(() =>
         user.value?.photo_url
@@ -24,12 +25,7 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await axios.get('users/me')
             user.value = response.data.data
-
-            if(user.value.user_type == 'A'){
-                await defaultCategoriesStore.loadDefaultCategories()
-            } else if (user.value.user_type == 'V'){
-                await categoriesStore.loadCategories()
-            }
+            socket.emit('loggedIn', user.value)
         } catch (error) {
             clearUser()
             throw error
@@ -41,8 +37,12 @@ export const useUserStore = defineStore('user', () => {
             const response = await axios.post('auth/login', credentials)
             axios.defaults.headers.common.Authorization = "Bearer " + response.data.access_token
             sessionStorage.setItem('token', response.data.access_token)
-            console.log(response.data.access_token)
             await loadUser()
+            if(user.value.user_type == 'A'){
+                await defaultCategoriesStore.loadDefaultCategories()
+            } else if (user.value.user_type == 'V'){
+                await categoriesStore.loadCategories()
+            }
             return true
         }
         catch (error) {
@@ -53,6 +53,7 @@ export const useUserStore = defineStore('user', () => {
     async function logout() {
         try {
             await axios.post('auth/logout')
+            socket.emit('loggedOut', user.value)
             clearUser()
             return true
         } catch (error) {
@@ -64,6 +65,7 @@ export const useUserStore = defineStore('user', () => {
         delete axios.defaults.headers.common.Authorization
         sessionStorage.removeItem('token')
         user.value = null
+        categoriesStore.clearCategories()
     }
 
     async function restoreToken() {
@@ -71,6 +73,11 @@ export const useUserStore = defineStore('user', () => {
         if (storedToken) {
             axios.defaults.headers.common.Authorization = "Bearer " + storedToken
             await loadUser()
+            if(user.value.user_type == 'A'){
+                await defaultCategoriesStore.loadDefaultCategories()
+            } else if (user.value.user_type == 'V'){
+                await categoriesStore.loadCategories()
+            }
             return true
         }
         clearUser()

@@ -69,7 +69,11 @@ class UserController extends Controller
     {
         // Check if the password is correct
         if (!Hash::check($request->current_password, $user->password)) {
-            return response()->json(['messages' => 'The current password field is incorrect!'], 403);
+            return response()->json([
+            'errors' => [
+                'current_password' => ['The current password field is incorrect!']
+            ]
+        ], 422);
         }
         
         try{

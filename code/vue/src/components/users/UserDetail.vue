@@ -17,7 +17,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["save", "cancel"]);
+const emit = defineEmits(["save", "cancel", "dismiss"]);
 
 const editingUser = ref(props.user)
 
@@ -46,15 +46,15 @@ const photoFullUrl = computed(() => {
   }
 })
 
-const userTitle = computed(()=>{
-    if (!editingUser.value) {
-      return ''
-    }
-    if(editingUser.value.user_type == 'A'){
-      return 'Admin #' + editingUser.value.id
-    }else if(editingUser.value.user_type == 'V'){
-        return 'Vcard #' + editingUser.value.id
-    }
+const userTitle = computed(() => {
+  if (!editingUser.value) {
+    return ''
+  }
+  if (editingUser.value.user_type == 'A') {
+    return 'Admin #' + editingUser.value.id
+  } else if (editingUser.value.user_type == 'V') {
+    return 'Vcard #' + editingUser.value.id
+  }
 })
 
 const save = () => {
@@ -68,6 +68,10 @@ const cancel = () => {
   emit("cancel", editingUser.value);
 }
 
+const dismiss = () => {
+  emit("dismiss", editingUser.value);
+}
+
 // When changing the photo file, change the editingImageAsBase64.value
 const changePhotoFile = () => {
   try {
@@ -77,13 +81,13 @@ const changePhotoFile = () => {
     } else {
       const reader = new FileReader()
       reader.addEventListener(
-          'load',
-          () => {
-            // convert image file to base64 string
-            editingImageAsBase64.value = reader.result
-            deletePhotoOnTheServer.value = false
-          },
-          false,
+        'load',
+        () => {
+          // convert image file to base64 string
+          editingImageAsBase64.value = reader.result
+          deletePhotoOnTheServer.value = false
+        },
+        false,
       )
       if (file) {
         reader.readAsDataURL(file)
@@ -109,34 +113,20 @@ const cleanPhoto = () => {
 <template>
   <form class="row g-3 needs-validation" novalidate @submit.prevent="save">
     <h3 class="mt-5 mb-3">{{ userTitle }}</h3>
-    <hr/>
+    <hr />
     <div class="d-flex flex-wrap justify-content-between">
       <div class="w-75 pe-4">
         <div class="mb-3">
           <label for="inputName" class="form-label">Name</label>
-          <input
-            type="text"
-            class="form-control"
-            :class="{ 'is-invalid': errors ? errors['name'] : false }"
-            id="inputName"
-            placeholder="User Name"
-            required
-            v-model="editingUser.name"
-          />
+          <input type="text" class="form-control" :class="{ 'is-invalid': errors ? errors['name'] : false }"
+            id="inputName" placeholder="User Name" required v-model="editingUser.name" />
           <field-error-message :errors="errors" fieldName="name"></field-error-message>
         </div>
 
         <div class="mb-3 px-1">
           <label for="inputEmail" class="form-label">Email</label>
-          <input
-            type="email"
-            class="form-control"
-            :class="{ 'is-invalid': errors ? errors['email'] : false }"
-            id="inputEmail"
-            placeholder="Email"
-            required
-            v-model="editingUser.email"
-          />
+          <input type="email" class="form-control" :class="{ 'is-invalid': errors ? errors['email'] : false }"
+            id="inputEmail" placeholder="Email" required v-model="editingUser.email" />
           <field-error-message :errors="errors" fieldName="email"></field-error-message>
         </div>
       </div>
@@ -148,8 +138,10 @@ const cleanPhoto = () => {
           </div>
           <div class="mt-3 d-flex justify-content-between flex-wrap">
             <label for="inputPhoto" class="btn btn-dark flex-grow-1 mx-1">Carregar</label>
-            <button class="btn btn-secondary flex-grow-1 mx-1" @click.prevent="resetToOriginalPhoto" v-if="editingUser.photo_url">Repor</button>
-            <button class="btn btn-danger flex-grow-1 mx-1" @click.prevent="cleanPhoto" v-show="editingUser.photo_url || editingImageAsBase64">Apagar</button>
+            <button class="btn btn-secondary flex-grow-1 mx-1" @click.prevent="resetToOriginalPhoto"
+              v-if="editingUser.photo_url">Repor</button>
+            <button class="btn btn-danger flex-grow-1 mx-1" @click.prevent="cleanPhoto"
+              v-show="editingUser.photo_url || editingImageAsBase64">Apagar</button>
           </div>
           <div>
             <field-error-message :errors="errors" fieldName="base64ImagePhoto"></field-error-message>
@@ -157,10 +149,23 @@ const cleanPhoto = () => {
         </div>
       </div>
     </div>
-    <hr/>
-    <div class="mt-2 d-flex justify-content-end">
-      <button type="button" class="btn btn-primary px-5 mx-2" @click="save">Save</button>
-      <button type="button" class="btn btn-light px-5 mx-2" @click="cancel">Cancel</button>
+    <hr />
+    <div class="mt-2 d-flex justify-content-between">
+      <div>
+      <router-link class="btn btn-primary px-5 mx-2" :class="{ active: $route.name === 'ChangePassword' }"
+        :to="{ name: 'ChangePassword' }"> <!--  -->
+        Change password
+      </router-link>
+      <router-link class="btn btn-primary px-5 mx-2" :class="{ active: $route.name === 'ChangeConfirmationCode' }" v-if="editingUser.user_type == 'V'"
+        :to="{ name: 'ChangeConfirmationCode' }"> <!--  -->
+        Change Confirmation Code
+      </router-link>
+      </div>
+      <div>
+        <button type="button" class="btn btn-primary px-5 mx-2" @click="save">Save</button>
+        <button type="button" class="btn btn-light px-5 mx-2" @click="cancel">Cancel</button>
+        <button type="button" class="btn btn-danger px-5 mx-2" @click="dismiss">Delete</button>
+      </div>
     </div>
   </form>
   <input type="file" style="visibility:hidden;" id="inputPhoto" ref="inputPhotoFile" @change="changePhotoFile" />

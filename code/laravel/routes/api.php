@@ -29,7 +29,7 @@ Route::middleware('auth:api')->group(
         Route::get('vcards', [VcardController::class, 'index'])->middleware('can:showAll,App\Models\VCard');
 
         Route::get('vcards/{vcard}', [VcardController::class, 'show'])->middleware('can:view,vcard');
-        Route::delete('vcards/{vcard}', [VcardController::class, 'destroy'])->middleware('can:destroy,App\Models\VCard');   // NOT working
+        Route::delete('vcards/{vcard}', [VcardController::class, 'destroy'])->middleware('can:delete,vcard');   // NOT working
         Route::patch('vcards/{vcard}', [VcardController::class, 'manageVcard'])->middleware('can:manageVcard,vcard');
 
         //Category routes

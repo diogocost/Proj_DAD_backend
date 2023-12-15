@@ -20,7 +20,7 @@ const app = createApp(App)
 
 const wsConnection = import.meta.env.VITE_WS_CONNECTION
 
-//app.provide('socket', io(wsConnection))
+app.provide('socket', io(wsConnection))
 
 app.provide(
   'axios',
@@ -33,7 +33,9 @@ app.provide(
 ) */
 
 const serverBaseUrl = 'http://laravel.test'
-app.provide('serverBaseUrl', serverBaseUrl)  
+app.provide('serverBaseUrl', serverBaseUrl) 
+app.provide('socket', io("http://localhost:8080"))
+
 // Default Axios configuration
 axios.defaults.baseURL = serverBaseUrl + '/api'
 axios.defaults.headers.common['Content-type'] = 'application/json'

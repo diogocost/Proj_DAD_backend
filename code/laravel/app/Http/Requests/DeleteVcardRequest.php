@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class DeleteVcardRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class DeleteVcardRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,9 +22,13 @@ class DeleteVcardRequest extends FormRequest
      */
     public function rules(): array
     {
+        $user = Auth::guard('api')->user();
+        if ($user->isAdmin()) {
+            return [];
+        }
         return [
             'password' => ['required'],
-            'confirmation_code' => ['required', 'numeric', 'digits:4'],
+            'confirmation_code' => ['required', 'numeric'],
         ];
     }
 }

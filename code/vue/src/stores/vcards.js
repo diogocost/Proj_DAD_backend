@@ -34,14 +34,22 @@ export const useVcardsStore = defineStore('vcards', () => {
         }
     }
 
-    async function deleteVcard(vcardId) {
+    async function deleteVcard(vcardId, data) {
         try {
-            await axios.delete(`vcards/${vcardId}`);
-            vcards.value = vcards.value.filter(v => v.id !== vcardId);
-            toast.success("Vcard deleted successfully");
+            if(data){
+                const config = {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    data: data // Pass additional data here
+                };
+                await axios.delete(`vcards/${vcardId}`, config);
+            } else{
+                await axios.delete(`vcards/${vcardId}`);
+                vcards.value = vcards.value.filter(v => v.id !== vcardId);
+            }
         } catch (error) {
-            console.error(error);
-            toast.error("Failed to delete vCard");
+            throw error;
         }
     }
 

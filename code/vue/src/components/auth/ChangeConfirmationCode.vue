@@ -19,14 +19,12 @@ const errors = ref(null)
 const toast = useToast()
 const changeConfirmationCode = async () => {
     try {
-        console.log(confirmationCodes.value)
         await userStore.changeConfirmationCode(confirmationCodes.value)
         toast.success('Confirmation Code has been changed.')
         router.back()
     } catch (error) {
         if (error.response?.status == 422) {
             errors.value = error.response.data.errors
-            console.log(error)
             toast.error('Confirmation Code has not been changed due to validation errors!')
         } else {
             toast.error('Confirmation Code has not been changed due to unknown server error!')

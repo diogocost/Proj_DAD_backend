@@ -1,16 +1,18 @@
 <script setup>
 import axios from 'axios'
-import { onMounted } from 'vue'
+import { inject, onMounted } from 'vue'
 import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useToast } from "vue-toastification"
 import { useUserStore } from './stores/user.js'
-//import { useProjectsStore } from "./stores/projects.js"
+import { useTransactionsStore } from './stores/transactions'
 
 const userStore = useUserStore()
-//const projectsStore = useProjectsStore()
+const transactionsStore = useTransactionsStore()
 
 const router = useRouter()
 const toast = useToast()
+const socket = inject("socket")
+
 
 const logout = async () => {
   if (await userStore.logout()) {
@@ -30,6 +32,12 @@ const clickMenuOption = () => {
   }
 }
 
+onMounted(() => {
+  socket.on('newTransaction', (transaction) => {
+    toast.success(`Received new transaction #${transaction.id}, Amount : ${transaction.value}€!`)
+    transactionsStore.loadTransactions()
+  })
+});
 /* onMounted(() => {
   userStore.restoreToken()
 }) */
@@ -114,19 +122,20 @@ const clickMenuOption = () => {
         <div class="position-sticky pt-3">
           <ul class="nav flex-column"> <!-- v-if="userStore.user" -->
             <li class="nav-item">
-              <router-link class="nav-link" :class="{ active: $route.name === 'home' }" :to="{ name: 'home' }" v-if="userStore.user"
-                @click="clickMenuOption"> <!--  -->
+              <router-link class="nav-link" :class="{ active: $route.name === 'home' }" :to="{ name: 'home' }"
+                v-if="userStore.user" @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-house"></i>
                 Dashboard
               </router-link>
             </li>
-            <li class="nav-item d-flex justify-content-between align-items-center pe-3" v-if="!userStore.userIsAdmin && userStore.user">
+            <li class="nav-item d-flex justify-content-between align-items-center pe-3"
+              v-if="!userStore.userIsAdmin && userStore.user">
               <router-link class="nav-link w-100 me-3" :class="{ active: $route.name === 'Transactions' }"
                 :to="{ name: 'Transactions' }" @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-list-check"></i>
                 Transactions
               </router-link>
-              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new transaction" 
+              <router-link class="link-secondary" :to="{ name: 'NewTransaction' }" aria-label="Add a new transaction"
                 @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-xs bi-plus-circle"></i>
               </router-link>
@@ -153,8 +162,8 @@ const clickMenuOption = () => {
               </router-link>
             </li>
             <li class="nav-item" v-if="userStore.userIsAdmin">
-              <router-link class="nav-link" :class="{ active: $route.name === 'DefaultCategories' }" :to="{ name: 'DefaultCategories' }"
-                @click="clickMenuOption"> <!--  -->
+              <router-link class="nav-link" :class="{ active: $route.name === 'DefaultCategories' }"
+                :to="{ name: 'DefaultCategories' }" @click="clickMenuOption"> <!--  -->
                 <i class="bi bi-files"></i>
                 ADM Default Categories List
               </router-link>

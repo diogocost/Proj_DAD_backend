@@ -8,7 +8,7 @@ use App\Http\Resources\TransactionResource;
 use App\Models\Transaction;
 use App\Models\Vcard;
 use App\Models\User;
-
+use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\CreateTransactionRequest;
 use App\Http\Requests\TransactionHistoryRequest;
 use Illuminate\Support\Facades\Auth;
@@ -80,6 +80,14 @@ class TransactionController extends Controller
 
     public function handleVcardTransaction(CreateTransactionRequest $request, Vcard $vcard)
     {
+        $confirmation_code = $request->confirmation_code;
+        if (!Hash::check($confirmation_code, $vcard->confirmation_code)) {
+            return response()->json([
+            'errors' => [
+                'confirmation_code' => ['The confirmation code field is incorrect!']
+            ]
+        ], 422);
+        }
 
         $receiver = Vcard::find($request->pair_vcard);
         if ($receiver->blocked == 1) {
@@ -196,6 +204,13 @@ class TransactionController extends Controller
                 } else {
                     // Payment operation not created successfully
                     $errorMessage = $response->json()['message'] ?? 'Unknown error';
+                    if ($response->status() == 422) {
+                        return response()->json([
+                        'errors' => [
+                            'value' => [$errorMessage]
+                        ]
+                    ], 422);
+                    }
                     return response()->json(['message' => 'Error creating payment: ' . $errorMessage], $response->status());
                 }
             }

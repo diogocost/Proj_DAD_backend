@@ -4,9 +4,9 @@ import { useToast } from "vue-toastification"
 import { useUserStore } from "../../stores/user.js"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
 import { ref, watch, computed } from 'vue'
-
 import TransactionDetail from "./TransactionDetail.vue"
 import { useTransactionsStore } from "../../stores/transactions.js"
+import ConfirmationCodeDialog from '../global/ConfirmationCodeDialog.vue'
 
 const toast = useToast()
 const router = useRouter()
@@ -16,19 +16,22 @@ const transactionsStore = useTransactionsStore()
 const newtransaction = () => {
   return {
     id: null,
-    vcard: userStore.userIsAdmin ? '' : userStore.userId,
+    vcard: userStore.userIsAdmin ? '' : userStore.userId.toString(),
     pair_vcard: '',
     description: '',
     value: null,
     type: userStore.userIsAdmin ? 'C' : 'D',
     category_id: null,
     payment_type: userStore.userIsAdmin ? '' : 'VCARD',
-    payment_reference: ''
+    payment_reference: '',
+    confirmation_code: '',
   }
 }
 const transaction = ref(newtransaction())
 const errors = ref(null)
 const confirmationLeaveDialog = ref(null)
+const confirmationCodeDialog = ref(null)
+// String with the JSON representation after loading the project (new or edit)
 let originalValueStr = ''
 
 const loadTransaction = async (id) => {
@@ -51,25 +54,20 @@ const loadTransaction = async (id) => {
 const save = async () => {
   errors.value = null
   if (operation.value == 'insert') {
-    const newTransaction = {
-      vcard: transaction.value.vcard,
-      payment_reference: transaction.value.payment_reference,
-      value: transaction.value.value, type: transaction.value.type,
-      category_id: transaction.value.category_id,
-      payment_type: transaction.value.payment_type,
-      description: transaction.value.description,
-      pair_vcard: transaction.value.pair_vcard,
-    };
     console.log('inserting transaction', transaction.value)
     try {
-      transaction.value = await transactionsStore.insertTransaction(newTransaction)
+      transaction.value = await transactionsStore.insertTransaction(transaction.value)
       originalValueStr = JSON.stringify(transaction.value)
       toast.success('Transaction #' + transaction.value.id + ' was created successfully.')
+      confirmationCodeDialog.value.hide()
       router.back()
     } catch (error) {
       if (error.response?.status == 422) {
         errors.value = error.response.data.errors
         console.log(error)
+        if(!error.response.data.errors.confirmation_code) {
+          confirmationCodeDialog.value.hide()
+        }
         toast.error('Transaction was not created due to validation errors!')
       } else {
         console.log(error)
@@ -91,6 +89,14 @@ const save = async () => {
         toast.error('Transaction #' + props.id + ' was not updated due to unknown server error!')
       }
     }
+  }
+}
+
+const handleSave = () => {
+  if(userStore.userIsAdmin || operation.value != 'insert'){
+    save()
+  } else {
+    confirmationCodeDialog.value.show()
   }
 }
 
@@ -142,10 +148,13 @@ onBeforeRouteLeave((to, from, next) => {
 
 
 <template>
+  <confirmation-code-dialog ref="confirmationCodeDialog" :data="transaction" @confirmed="save" :errors="errors" :showPassword="false"
+  msg="To send a transactions the you need to provide your confirmation code">
+  </confirmation-code-dialog>
   <confirmation-dialog ref="confirmationLeaveDialog" confirmationBtn="Discard changes and leave"
     msg="Do you really want to leave? You have unsaved changes!" @confirmed="leaveConfirmed">
   </confirmation-dialog>
 
-  <transaction-detail :operationType="operation" :transaction="transaction" :errors="errors" @save="save"
+  <transaction-detail :operationType="operation" :transaction="transaction" :errors="errors" @save="handleSave"
     @cancel="cancel"></transaction-detail>
 </template>

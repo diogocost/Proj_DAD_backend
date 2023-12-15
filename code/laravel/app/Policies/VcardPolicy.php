@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Vcard;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class VcardPolicy
 {
@@ -28,11 +29,10 @@ class VcardPolicy
         return $vcard->phone_number == $user->id || $user->isAdmin();
     }
 
-    public function destroy(User $user)
+    public function delete(User $user, Vcard $vcard)
     {
-        return $user->user_type == "A";
+        return $vcard->phone_number == $user->id || $user->isAdmin();
     }
-    
 
     public function manageVcard(User $user, Vcard $vcard)
     {
@@ -40,9 +40,6 @@ class VcardPolicy
         return $user->isAdmin();
     }
     
-
-
-
     public function showAll(User $user)
     {
         return $user->isAdmin();
