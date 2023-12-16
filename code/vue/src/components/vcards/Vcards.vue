@@ -1,51 +1,129 @@
-<template>
-  <div>
-    <h1>Vcards Management</h1>
-
-    <!-- Filters Section -->
-    <div>
-      <input v-model="filterParams.phone_number" placeholder="Filter by Phone Number">
-      <input v-model="filterParams.name" placeholder="Filter by Name">
-      <input v-model="filterParams.email" placeholder="Filter by Email">
-      <button @click="fetchVcards">Search</button>
-    </div>
-
-    <vcard-table :vcards="filteredVcards" @manage="manageVcard" @delete="deleteVcard"></vcard-table>
-  </div>
-</template>
-
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import { useVcardsStore } from '@/stores/vcards';
 import VcardTable from './VcardTable.vue';
+import { useRouter } from 'vue-router';
+import { useToast } from "vue-toastification";
+
+
+const router = useRouter();
+const toast = useToast();
 
 const store = useVcardsStore();
 const filterParams = ref({
   phone_number: '',
   name: '',
-  email: ''
+  email: '',
+  blocked: '',
+  max_debit: '',
 });
 
-const fetchVcards = () => store.fetchVcards();
-
-const filteredVcards = computed(() => {
-  return store.vcards.filter(vcard =>
-    (filterParams.value.phone_number === '' || vcard.phone_number.includes(filterParams.value.phone_number)) &&
-    (filterParams.value.name === '' || vcard.name.includes(filterParams.value.name)) &&
-    (filterParams.value.email === '' || vcard.email.includes(filterParams.value.email))
-  );
+// Fetch initial data
+onMounted(() => {
+  //store.fetchVcards(filterParams.value);
+  fetchFunction()
 });
 
-watch(filterParams, fetchVcards);
+// Reactive data for vcards and total vcards count
+const vcards = computed(() => store.vcards);
+const totalVcards = computed(() => vcards.value.length);
 
-const manageVcard = (vcardId, data) => store.manageVcard(vcardId, data);
-const deleteVcard = vcardId => store.deleteVcard(vcardId);
+// Watch for filter changes and fetch new data
+watch(filterParams, () => {
+  //store.fetchVcards(filterParams.value);
+  fetchFunction()
+}, { deep: true });
 
-fetchVcards();
+
+
+
+const handleDelete = (vcard) => {
+console.log(vcard)
+  if(parseFloat(vcard.balance) == '0') {
+    store.deleteVcard(vcard); // Make sure 'id' matches the property name of vCard's ID
+    fetchFunction()
+    console.log("Deleting vcard with ID:", vcard.phone_number);
+  } else {
+    toast.error('Vcard balance its not 0€ can not be deleted');
+  }
+};
+
+const handleBlockUnblock = (vcard) => {
+  store.blockUnblock(vcard);
+  fetchFunction()
+};
+
+const handleChangeMaxDebit = (data) => {
+  store.changeMaxDebitVcard(data.vcard, data.payload)
+  fetchFunction()
+};
+
+const fetchFunction = () => {
+  store.fetchVcards(filterParams.value);
+}
 </script>
 
 
+<template>
+  <div class="flex-container">
+    <div class="d-flex justify-content-between">
+      <div class="mx-2">
+        <h3 class="mt-4">Vcards Management</h3>
+      </div>
+      <div class="mx-2 total-filtro">
+        <h5 class="mt-4">Total: {{ totalVcards }}</h5>
+      </div>
+    </div>
+    <hr>
+    <div class="mb-3 d-flex justify-content-between flex-wrap">
+      <!-- Filters Section -->
+      <div class="filter-container">
+        <!-- Add more filters as needed -->
+         <!-- Blocked/Unblocked Filter -->
+      <div class="filter-input">
+        <label for="filterByBlockedStatus">Blocked Status:</label>
+        <select id="filterByBlockedStatus" v-model="filterParams.blocked" class="form-select">
+          <option selected value="">Any</option>
+          <option value="true">Blocked</option>
+          <option value="false">Unblocked</option>
+        </select>
+      </div>
+      <!-- Blocked/Unblocked Filter -->
+        <div class="filter-input">
+          <label for="filterByPhoneNumber">Phone Number:</label>
+          <input type="text" id="filterByPhoneNumber" v-model="filterParams.phone_number" class="form-control" placeholder="Filter by Phone Number">
+        </div>
+        <div class="filter-input">
+          <label for="filterByName">Name:</label>
+          <input type="text" id="filterByName" v-model="filterParams.name" class="form-control" placeholder="Filter by Name">
+        </div>
+        <div class="filter-input">
+          <label for="filterByEmail">Email:</label>
+          <input type="text" id="filterByEmail" v-model="filterParams.email" class="form-control" placeholder="Filter by Email">
+        </div>
+        <!-- Add other filters here if necessary -->
+        
+      </div>
+    </div>
+
+    <!-- Vcard Table Component -->
+    <VcardTable 
+      :vcards="vcards" 
+      @delete="handleDelete" 
+      @blockUnblock="handleBlockUnblock"  
+      @changeMaxDebit="handleChangeMaxDebit">
+    </VcardTable>
+  </div>
+</template>
+
+
 <style scoped>
+.flex-container {
+  display: flex;
+  flex-direction: column;
+  height: 93.1vh;
+}
+
 .filter-container {
   display: flex;
   flex-wrap: wrap;
@@ -61,7 +139,6 @@ fetchVcards();
 .filter-button {
   padding: 0.5rem 1rem;
   background-color: #4CAF50;
-  /* Green */
   color: white;
   border: none;
   border-radius: 4px;
@@ -71,5 +148,8 @@ fetchVcards();
 .filter-button:hover {
   background-color: #45a049;
 }
-</style>
 
+.total-filtro {
+  margin-top: 0.35rem;
+}
+</style>

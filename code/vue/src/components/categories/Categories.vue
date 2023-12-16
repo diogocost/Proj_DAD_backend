@@ -7,13 +7,14 @@ import { useUserStore } from '../../stores/user.js'
 
 const router = useRouter()
 const userStore = useUserStore()
-const filterType = ref('all')
+const filterOptions = [{ label: 'All', value: 'all' }, { label: 'Debit', value: 'D' }, { label: 'Credit', value: 'C' }]; // Filter options
+const selectedFilter = ref('all'); // Ref for the selected filter
 
 const filteredCategories = computed(() => {
-  if (filterType.value === 'all') {
-    return categories.value;
-  }
-  return categories.value.filter(category => category.type === filterType.value);
+    if (selectedFilter.value === 'all') {
+        return categories.value;
+    }
+    return categories.value.filter(category => category.type === selectedFilter.value);
 });
 
 const loadCategories = async () => {
@@ -52,7 +53,7 @@ const props = defineProps({
 const categories = ref([])
 
 const totalCategories = computed(() => {
-    return categories.value.length;
+    return filteredCategories.value.length;
 });
 
 onMounted(() => {
@@ -61,10 +62,21 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="mb-3 d-flex justify-content-between flex-wrap">
-        <div class="mx-2 mt-2">
-            <button type="button" class="btn btn-success px-4 btn-addtask" @click.prevent="addCategory"><i
-                    class="bi bi-xs bi-plus-circle"></i>&nbsp; Add Category</button>
+    <div class="actions-container">
+        <!-- Add Category Button -->
+        <div class="add-category-container">
+            <button type="button" class="btn btn-success px-4 btn-addtask" @click.prevent="addCategory">
+                <i class="bi bi-xs bi-plus-circle"></i>&nbsp; Add Category
+            </button>
+        </div>
+
+        <!-- Filter Dropdown -->
+        <div class="filter-container">
+            <select v-model="selectedFilter" class="form-select">
+                <option v-for="option in filterOptions" :key="option.value" :value="option.value">
+                    {{ option.label }}
+                </option>
+            </select>
         </div>
     </div>
     <div class="d-flex justify-content-between">
@@ -93,4 +105,17 @@ onMounted(() => {
 .btn-addtask {
     margin-top: 1.85rem;
 }
-</style>
+
+.add-category-container,
+.filter-container {
+    margin-bottom: 1rem;
+    /* Spacing between the elements */
+}
+
+.actions-container {
+    display: flex;
+    flex-direction: column;
+    /* Stack children vertically */
+    align-items: start;
+    /* Align items to the start of the container */
+}</style>
