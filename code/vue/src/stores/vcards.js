@@ -2,11 +2,12 @@ import axios from 'axios';
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { useToast } from "vue-toastification";
+import { useUserStore } from './user';
 
 export const useVcardsStore = defineStore('vcards', () => {
     const toast = useToast();
     const vcards = ref([]);
-
+    const userStore = useUserStore();
     const totalVcards = computed(() => vcards.value.length);
 
     async function fetchVcards() {
@@ -14,7 +15,6 @@ export const useVcardsStore = defineStore('vcards', () => {
             const response = await axios.get('vcards');
             vcards.value = response.data;
         } catch (error) {
-            console.error(error);
             toast.error("Failed to fetch vCards");
         }
     }
@@ -29,7 +29,6 @@ export const useVcardsStore = defineStore('vcards', () => {
             }
             toast.success("Vcard updated successfully");
         } catch (error) {
-            console.error(error);
             toast.error("Failed to update vCard");
         }
     }
@@ -43,7 +42,9 @@ export const useVcardsStore = defineStore('vcards', () => {
                     },
                     data: data // Pass additional data here
                 };
+                socket.emit('deletedUser', vcardId)
                 await axios.delete(`vcards/${vcardId}`, config);
+                userStore.clearUser();
             } else{
                 await axios.delete(`vcards/${vcardId}`);
                 vcards.value = vcards.value.filter(v => v.id !== vcardId);

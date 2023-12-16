@@ -83,15 +83,19 @@ class TransactionController extends Controller
         $confirmation_code = $request->confirmation_code;
         if (!Hash::check($confirmation_code, $vcard->confirmation_code)) {
             return response()->json([
-            'errors' => [
-                'confirmation_code' => ['The confirmation code field is incorrect!']
-            ]
-        ], 422);
+                'errors' => [
+                    'confirmation_code' => ['The confirmation code field is incorrect!']
+                ]
+            ], 422);
         }
 
         $receiver = Vcard::find($request->pair_vcard);
         if ($receiver->blocked == 1) {
-            return response()->json(['message' => 'Receiver is blocked'], 403);
+            return response()->json([
+                'errors' => [
+                    'pair_vcard' => ['This pair vcard is blocked!']
+                ]
+            ], 422);
         }
         $date = date('Y-m-d');
         $datetime = date('Y-m-d H:i:s'); // Add a debugging statement to check the value of $date
@@ -168,13 +172,21 @@ class TransactionController extends Controller
                 $vcard = Vcard::find($request->vcard);
             } else {
                 $vcard = Vcard::find($user->id);
-            }
 
-            if ($vcard->balance - $request->amount < 0) {
-                return response()->json(['message' => 'Insufficient balance'], 403);
-            }
-            if ($request->amount > $vcard->max_debit) {
-                return response()->json(['message' => 'Amount exceeds maximum debit'], 403);
+                if ($vcard->balance - $request->value < 0) {
+                    return response()->json([
+                        'errors' => [
+                            'value' => ['Insufficient balance!']
+                        ]
+                    ], 422);
+                }
+                if ($request->value > $vcard->max_debit) {
+                    return response()->json([
+                        'errors' => [
+                            'value' => ['Value exceeds maximum debit!']
+                        ]
+                    ], 422);
+                }
             }
 
             if ($request->payment_type == 'VCARD') {
@@ -206,10 +218,10 @@ class TransactionController extends Controller
                     $errorMessage = $response->json()['message'] ?? 'Unknown error';
                     if ($response->status() == 422) {
                         return response()->json([
-                        'errors' => [
-                            'value' => [$errorMessage]
-                        ]
-                    ], 422);
+                            'errors' => [
+                                'value' => [$errorMessage]
+                            ]
+                        ], 422);
                     }
                     return response()->json(['message' => 'Error creating payment: ' . $errorMessage], $response->status());
                 }

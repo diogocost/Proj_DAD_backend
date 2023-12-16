@@ -58,7 +58,6 @@ export const useDefaultCategoriesStore = defineStore('defaultCategories', () => 
     async function updateDefaultCategory(updateDefaultCategorie) {
         // Note that when an error occours, the exception should be
         // catch by the function that called the updateCategorie
-        console.log(updateDefaultCategorie)
         const response = await axios.put('default_categories/' + updateDefaultCategorie.id, updateDefaultCategorie)
         let idx = defaultCategories.value.findIndex((t) => t.id === response.data.data.id)
         if (idx >= 0) {

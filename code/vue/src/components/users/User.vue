@@ -36,18 +36,13 @@ const save = async (userToSave) => {
     errors.value = null
     const type = userStore.userIsAdmin ? 'Admin' : 'Vcard'
     try {
-        const response = await axios.put('users/' + userStore.userId, userToSave)
-        user.value = response.data.data
-        const id = user.value.id ? user.value.id : user.value.phone_number
+        await userStore.updateUser(userToSave.id, userToSave)
         originalValueStr = JSON.stringify(user.value)
-        toast.success(type + ' #' + id + ' was updated successfully.')
-        if (user.value.id == userStore.userId) {
-            await userStore.loadUser()
-        }
+        toast.success(type + ' #' + userStore.userId + ' was updated successfully.')
         //socket.emit('updatedUser', user.value)
         router.back()
     } catch (error) {
-        if (error.response.status == 422) {
+        if (error.response?.status == 422) {
             errors.value = error.response.data.errors
             toast.error(type + ' #' + userStore.userId + ' was not updated due to validation errors!')
         } else {
@@ -63,28 +58,28 @@ const cancel = () => {
 
 const dismiss = async () => {
     errors.value = null
-    if (user.userIsAdmin) {
+    if (userStore.userIsAdmin) {
         try {
             await axios.delete('admins/' + userStore.userId)
-            userStore.logout()
-            codeDialog.value.hide()
             toast.success('Admin #' + userStore.userId + ' was deleted successfully.')
-            //socket.emit('deletedUser', user.value)
+            socket.emit('deletedUser', userStore.userId)
+            userStore.clearUser()
+            originalValueStr = JSON.stringify(user.value)
             router.back()
         } catch (error) {
             toast.error('Admin  #' + userStore.userId + ' was not deleted due to unknown server error!')
         }
     } else {
         try {
+            const userId = userStore.userId
             await vcardsStore.deleteVcard(userStore.userId, deleteConfirmationData.value)
             codeDialog.value.hide()
-            userStore.logout()
-            toast.success('Vcard #' + userStore.userId + ' was deleted successfully.')
+            socket.emit('deletedUser', userId)
+            toast.success('Vcard #' + userId + ' was deleted successfully.')
+            originalValueStr = JSON.stringify(user.value)
             router.push({ name: 'home' })
         } catch (error) {
-            console.log(error)
             if (error.response?.status == 422) {
-                console.log(error.response.data.errors)
                 errors.value = error.response.data.errors
                 toast.error('Vcard  #' + userStore.userId + ' was not deleted due to validation errors!')
             } else {
@@ -95,8 +90,7 @@ const dismiss = async () => {
 }
 
 const handleDismiss = () => {
-    console.log('handleDismiss')
-    if (user.userIsAdmin) {
+    if (userStore.userIsAdmin) {
         dismiss()
     } else {
         codeDialog.value.show()
@@ -127,12 +121,9 @@ onBeforeRouteLeave((to, from, next) => {
 </script>
 
 <template>
-    <div>
-        
     <confirmation-code-dialog ref="codeDialog" :data="deleteConfirmationData" @confirmed="dismiss"
         :errors="errors" :showPassword="true" title="Insert password and code">
     </confirmation-code-dialog>
-    </div>
     <confirmation-dialog ref="confirmationLeaveDialog" confirmationBtn="Discard changes and leave"
         msg="Do you really want to leave? You have unsaved changes!" @confirmed="leaveConfirmed">
     </confirmation-dialog>

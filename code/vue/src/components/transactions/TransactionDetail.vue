@@ -97,7 +97,7 @@ const cancel = () => {
       <div class="me-3 filter-div flex-grow-1">
         <label for="inputValue" class="form-label">Value</label>
         <input type="number" class="form-control" id="inputValue" placeholder="Transaction Value"
-          :disabled="props.operationType == 'update'" v-model="editingTransaction.value">
+          :disabled="props.operationType == 'update'" v-model="editingTransaction.value" :class="{ 'is-invalid': errors ? errors['value'] : false }">
         <field-error-message :errors="errors" fieldName="value"></field-error-message>
       </div>
       <!-- Transaction Type -->
@@ -128,15 +128,15 @@ const cancel = () => {
       <div class="me-3 filter-div flex-grow-1" v-if="editingTransaction.payment_type != 'VCARD'">
         <label for="inputPaymentReference" class="form-label">Payment Reference</label>
         <input type="text" class="form-control" id="inputPaymentReference" placeholder="Payment Reference"
-          :disabled="props.operationType == 'update'" v-model="editingTransaction.payment_reference">
+          :disabled="props.operationType == 'update'" v-model="editingTransaction.payment_reference" :class="{ 'is-invalid': errors ? errors['payment_reference'] : false }">
         <field-error-message :errors="errors" fieldName="payment_reference"></field-error-message>
       </div>
 
       <!-- Pair Vcard -->
-      <div class="me-3 filter-div flex-grow-1" v-if="editingTransaction.payment_type == 'VCARD'">
+      <div class="me-3 filter-div flex-grow-1" v-if="editingTransaction.payment_type == 'VCARD'" >
         <label for="inputPairVcard" class="form-label">Pair Vcard</label>
         <input type="text" class="form-control" id="inputPairVcard" placeholder="Pair Vcard"
-          :disabled="props.operationType == 'update'" v-model="editingTransaction.pair_vcard">
+          :disabled="props.operationType == 'update'" v-model="editingTransaction.pair_vcard" :class="{ 'is-invalid': errors ? errors['pair_vcard'] : false }">
         <field-error-message :errors="errors" fieldName="pair_vcard"></field-error-message>
       </div>
       <!-- Category -->

@@ -59,8 +59,11 @@ const userTitle = computed(() => {
 
 const save = () => {
   const userToSave = editingUser.value
-  userToSave.deletePhotoOnServer = deletePhotoOnTheServer.value
-  userToSave.base64ImagePhoto = editingImageAsBase64.value
+  if(deletePhotoOnTheServer.value) {
+    userToSave.base64ImagePhoto = ''
+  }else if(editingImageAsBase64.value) {
+    userToSave.base64ImagePhoto = editingImageAsBase64.value
+  }
   emit("save", userToSave);
 }
 
@@ -134,7 +137,7 @@ const cleanPhoto = () => {
         <div class="d-flex flex-column">
           <label class="form-label">Photo</label>
           <div class="form-control text-center">
-            <img :src="photoFullUrl" class="w-100" />
+            <img type="file" :src="photoFullUrl" class="w-100" />
           </div>
           <div class="mt-3 d-flex justify-content-between flex-wrap">
             <label for="inputPhoto" class="btn btn-dark flex-grow-1 mx-1">Carregar</label>

@@ -43,4 +43,10 @@ io.on("connection", (socket) => {
   socket.on('updatedUser', function (user) {
     socket.in(user.id).emit('updatedUser', user)
   })
+  socket.on('deletedUser', function (userId) {
+    socket.leave(userId)
+    if (user.type == 'A') {
+      socket.leave('administrator')
+    }
+  })
 });

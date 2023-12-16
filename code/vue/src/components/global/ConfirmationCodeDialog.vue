@@ -21,10 +21,6 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    msg: {
-        type: String,
-        default: "",
-    },
     errors: {
         type: Object,
         required: false,
@@ -65,10 +61,10 @@ defineExpose({ show, hide })
 <template>
     <!-- Button trigger to Show modal - HIDDEN -->
     <button ref="hiddenButtonToShowDialog" type="button" class="d-none" data-bs-toggle="modal"
-        data-bs-target="#confirmationModalId"></button>
+        data-bs-target="#confirmationCodeModalId"></button>
 
     <!-- Modal -->
-    <div class="modal fade" id="confirmationModalId" tabindex="-1" aria-labelledby="confirmationModalLabel"
+    <div class="modal fade" id="confirmationCodeModalId" tabindex="-1" aria-labelledby="confirmationModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <!-- Button trigger to Hide modal - HIDDEN -->
