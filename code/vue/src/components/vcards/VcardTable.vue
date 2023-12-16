@@ -1,43 +1,142 @@
-<template>
-  <ag-grid-vue style="width: 100%; height: 100%;" class="ag-theme-alpine" :columnDefs="columns" :rowData="vcards"
-    :pagination="true" :paginationAutoPageSize="true"></ag-grid-vue>
-</template>
-
 <script setup>
-import { AgGridVue } from 'ag-grid-vue3';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
 
+import { ref, inject } from "vue"; //delete inject
+import "ag-grid-community/styles//ag-grid.css";
+import "ag-grid-community/styles//ag-theme-quartz.css";
+import { AgGridVue } from "ag-grid-vue3";
+import avatarNoneUrl from '@/assets/avatar-none.png';
 
-defineProps({
+const props = defineProps({
   vcards: Array
 });
 
-const columns = [
-  // Define columns here
-  { headerName: 'Phone Number', field: 'phone_number' },
-  // Other column definitions...
-];
+const serverBaseUrl = inject("serverBaseUrl");
+
+const emit = defineEmits(['delete', 'blockUnblock', 'changeMaxDebit']);
+
+const columns = ref([
+  { headerName: 'Photo', field: 'photo_url', cellRenderer: params => {return `<div class="d-flex justify-content-center align-middle"><img src="${serverBaseUrl}/storage/fotos/${params.value || avatarNoneUrl}" class="rounded-circle img_photo" style="width: 40px; height: 40px;" /></div>`;}},
+  { headerName: 'Phone Number', field: 'phone_number', sortable: true },
+  { headerName: 'Name', field: 'name', sortable: true },
+  { headerName: 'Email', field: 'email', sortable: true },
+  { headerName: 'Balance', field: 'balance', sortable: true },
+  { headerName: 'Max Debit', field: 'max_debit', sortable: true },
+  { headerName: 'Blocked', field: 'blocked', sortable: true, cellRenderer: params => params.value ? 'Yes' : 'No' },
+  {
+    headerName: 'Actions',
+    field: 'actions',
+    cellRenderer: function(params) {
+      // Create container
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'd-flex justify-content-between align-middle';
+
+      // Delete button
+      const deleteButton = document.createElement('button');
+      deleteButton.innerHTML = 'Delete';
+      deleteButton.className = 'btn btn-sm btn-danger';
+      deleteButton.addEventListener('click', () => emitDelete(params.data));
+      actionsDiv.appendChild(deleteButton);
+
+      // Block/Unblock button
+      const toggleButton = document.createElement('button');
+      toggleButton.className = `btn btn-sm ${params.data.blocked ? 'btn-warning' : 'btn-success'}`;
+      toggleButton.innerHTML = params.data.blocked ? 'Unblock' : 'Block';
+      toggleButton.addEventListener('click', () => emitBlockUnblock(params.data));
+      actionsDiv.appendChild(toggleButton);
+
+      // Change max debit button
+       // Change max debit button
+       const changeDebitButton = document.createElement('button');
+      changeDebitButton.innerHTML = 'Change Debit Limit';
+      changeDebitButton.className = 'btn btn-sm btn-primary';
+      changeDebitButton.addEventListener('click', () => emitChangeMaxDebit(params.data));
+      actionsDiv.appendChild(changeDebitButton);
+
+      // Return the complete div with all buttons
+      return actionsDiv;
+    },
+    editable: false,
+    filter: false,
+    minWidth: 300,
+    resizable: true
+  }
+]);
+
+function emitDelete(vcard) {
+  console.log('delete vcard clicked:', vcard);
+  emit('delete', vcard);
+}
+
+function emitBlockUnblock(vcard) {
+  emit('blockUnblock', vcard);
+  //console.log(`${vcard.blocked ? 'Unblock' : 'Block'} vcard clicked:`, vcard);
+}
+
+function emitChangeMaxDebit(vcard) {
+  // Prompt the user to enter a new max debit value
+  const newMaxDebit = prompt('Enter new max debit limit:', vcard.max_debit);
+
+  // Check if the user entered a value and it's different from the current max debit
+  if (newMaxDebit !== null && newMaxDebit !== vcard.max_debit && newMaxDebit > 0) {
+    // Parse the input to a float to ensure it's a valid number
+    const parsedMaxDebit = parseFloat(newMaxDebit);
+
+    // If the parsed number is a valid number, emit the changeMaxDebit event
+    if (!isNaN(parsedMaxDebit)) {
+      const payload = {
+        max_debit: parsedMaxDebit,
+      };
+
+      // Emit the changeMaxDebit event with vcard ID and the new max debit value
+      emit('changeMaxDebit', { vcard, payload });
+      console.log(`change max debit clicked for vcard:`, vcard);
+    } else {
+      // If the user did not enter a valid number, show an error message
+      alert('Please enter a valid number for max debit limit.');
+    }
+  }
+}
+
 </script>
 
+<template>
+  
+  <ag-grid-vue 
+    style="width: 100%; height: 100%;" 
+    class="ag-theme-quartz" 
+    :columnDefs="columns" 
+    :rowData="vcards"
+    :pagination="true" 
+    :paginationAutoPageSize="true">
+  </ag-grid-vue>
+  </template>
+
 <style scoped>
-.ag-theme-alpine {
-  height: 600px;
-  /* Adjust as needed */
+.ag-theme-quartz {
+  height: 600px; /* Adjust as needed */
   width: 100%;
 }
 
-.ag-header-cell,
-.ag-cell {
+/* Header styles */
+.ag-header-cell {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
   text-align: left;
   padding: 0.5rem;
 }
 
-.ag-header-cell {
-  background-color: #f8f9fa;
-  border-bottom: 2px solid #dee2e6;
+/* Cell styles */
+.ag-cell {
+  text-align: left;
+  padding: 0.5rem;
+  border-right: 1px solid #dee2e6;
 }
 
+.ag-cell:last-child {
+  border-right: none;
+}
+
+/* Row styles */
 .ag-row {
   background-color: white;
 }
@@ -50,14 +149,7 @@ const columns = [
   background-color: #e9ecef;
 }
 
-.ag-cell {
-  border-right: 1px solid #dee2e6;
-}
-
-.ag-cell:last-child {
-  border-right: none;
-}
-
+/* Button styles */
 .button-cell button {
   margin-right: 0.5rem;
   background-color: #007bff;
@@ -70,5 +162,17 @@ const columns = [
 
 .button-cell button:hover {
   background-color: #0056b3;
+}
+
+/* Completed task style if applicable */
+.completed {
+  text-decoration: line-through;
+}
+
+/* Sorting icons style */
+.sort-icons {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: small;
 }
 </style>

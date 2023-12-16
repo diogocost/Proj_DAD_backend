@@ -42,6 +42,23 @@ class VcardController extends Controller
         if ($request->has('created_at_end')) {
             $query->whereDate('created_at', '<=', $request->input('created_at_end'));
         }
+		
+		if ($request->has('phone_number')) {
+                $phoneNumber = $request->input('phone_number');
+                $query->where('phone_number', 'like', "%{$phoneNumber}%");
+            }
+
+            // Filter by name
+            if ($request->has('name')) {
+                $name = $request->input('name');
+                $query->where('name', 'like', "%{$name}%");
+            }
+
+            // Filter by email
+            if ($request->has('email')) {
+                $email = $request->input('email');
+                $query->where('email', 'like', "%{$email}%");
+            }
 
         // Fetch and return the results
         $vcards = $query->get();

@@ -1,7 +1,7 @@
 <script setup>
-import axios from 'axios'
+//import axios from 'axios'
 import { useToast } from "vue-toastification"
-import { useUserStore } from '../../stores/user.js'
+//import { useUserStore } from '../../stores/user.js'
 import { ref, watch} from 'vue'
 import VcardDetail from "./VcardDetail.vue"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
