@@ -24,7 +24,7 @@ Route::middleware('auth:api')->group(function () {
         Route::patch('vcards/{vcard}/confirmation_code', [VcardController::class, 'updatesConfirmationCode'])->middleware('can:updateConfirmationCode,vcard');
         Route::get('vcards/{vcard}/categories', [CategoryController::class, 'getCetegoriesOfVcard'])->middleware('can:viewCategories,vcard');
         Route::get('vcards/{vcard}/transactions', [TransactionController::class, 'getTransactionsOfVcard'])->middleware('can:viewTransactions,vcard');
-        Route::get('vcards', [VcardController::class, 'index'])->middleware('can:showAll,vcard');
+        Route::get('vcards', [VcardController::class, 'index'])->middleware('can:showAll,App\Models\Vcard');
 
         Route::get('vcards/{vcard}', [VcardController::class, 'show'])->middleware('can:view,vcard');
         Route::delete('vcards/{vcard}', [VcardController::class, 'destroy'])->middleware('can:destroy,App\Models\VCard');   // NOT working
