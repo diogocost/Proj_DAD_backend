@@ -17,6 +17,7 @@ import Administrator from "../components/administrators/Administrator.vue"
 import Vcard from "../components/vcards/Vcard.vue"
 import Vcards from "../components/vcards/Vcards.vue"
 import Statistics from "../components/statistics/Statistics.vue"
+import Dashboard from "../components/dashboard/Dashboard.vue"
 //import Users from "../components/users/Users.vue"
 //import ProjectTasks from "../components/projects/ProjectTasks.vue"
 //import Task from "../components/tasks/Task.vue"
@@ -31,6 +32,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView
+    },
+    {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: Dashboard
     },
     {
       path: '/about',

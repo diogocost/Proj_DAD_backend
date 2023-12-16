@@ -13,9 +13,21 @@ export const useVcardsStore = defineStore('vcards', () => {
         try {
             const response = await axios.get('vcards');
             vcards.value = response.data;
+         
         } catch (error) {
             console.error(error);
             toast.error("Failed to fetch vCards");
+        }
+    }
+
+    async function loadVcard(vcardId) {
+        try {
+            const response = await axios.get(`vcards/${vcardId}`);
+            // Assuming response contains vcard data
+            return response.data;
+        } catch (error) {
+            // Handle error
+            throw error;
         }
     }
 
@@ -56,6 +68,7 @@ export const useVcardsStore = defineStore('vcards', () => {
     return {
         vcards,
         totalVcards,
+        loadVcard,
         fetchVcards,
         manageVcard,
         deleteVcard,

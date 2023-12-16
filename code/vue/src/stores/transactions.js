@@ -42,6 +42,8 @@ export const useTransactionsStore = defineStore('transactions', () => {
         }
     }
 
+ 
+
     async function insertTransaction(newTransaction) {
         // Note that when an error occours, the exception should be
         // catch by the function that called the insertTransaction
