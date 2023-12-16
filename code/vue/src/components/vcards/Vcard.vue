@@ -1,7 +1,7 @@
 <script setup>
-//import axios from 'axios'
+import axios from 'axios'
 import { useToast } from "vue-toastification"
-//import { useUserStore } from '../../stores/user.js'
+import { useUserStore } from '../../stores/user.js'
 import { ref, watch} from 'vue'
 import VcardDetail from "./VcardDetail.vue"
 import { useRouter, onBeforeRouteLeave } from 'vue-router'
@@ -67,8 +67,8 @@ const save = async (userToSave) => {
       })
       router.push({name: 'home'})
     } catch (error) {
-      console.log(error)
-      if (error.response.status == 422) {
+        console.log(error)
+      if (error.response?.status == 422) {
         errors.value = error.response.data.errors
         toast.error('Vcard was not registered due to validation errors!')
       } else {

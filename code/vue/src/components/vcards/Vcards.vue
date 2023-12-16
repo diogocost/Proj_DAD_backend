@@ -37,24 +37,24 @@ watch(filterParams, () => {
 
 
 
-const handleDelete = (vcard) => {
+const handleDelete = async (vcard) => {
 console.log(vcard)
   if(parseFloat(vcard.balance) == '0') {
-    store.deleteVcard(vcard); // Make sure 'id' matches the property name of vCard's ID
+    await store.deleteVcard(vcard.phone_number); // Make sure 'id' matches the property name of vCard's ID
     fetchFunction()
-    console.log("Deleting vcard with ID:", vcard.phone_number);
+    toast.success('Vcard #'+vcard.phone_number+ ' deleted successfully');
   } else {
     toast.error('Vcard balance its not 0€ can not be deleted');
   }
 };
 
-const handleBlockUnblock = (vcard) => {
-  store.blockUnblock(vcard);
+const handleBlockUnblock = async (vcard) => {
+  await store.blockUnblock(vcard);
   fetchFunction()
 };
 
-const handleChangeMaxDebit = (data) => {
-  store.changeMaxDebitVcard(data.vcard, data.payload)
+const handleChangeMaxDebit = async (data) => {
+  await store.changeMaxDebitVcard(data.vcard, data.payload)
   fetchFunction()
 };
 

@@ -13,7 +13,7 @@ use App\Http\Controllers\api\DefaultCategoryController;
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [UserController::class, 'store'])->middleware('can:create,App\Models\User');
-Route::middleware('auth:api')->group(
+Route::middleware('auth:api', 'blocked')->group(
     function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
 

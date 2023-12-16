@@ -18,6 +18,11 @@ class VcardPolicy
         return $vcard->phone_number == $user->id;
     }
 
+    public function viewTransactions(User $user, Vcard $vcard)
+    {
+        return $vcard->phone_number == $user->id;
+    }
+
     public function viewAny(User $user)
     {
         return $user->isAdmin();

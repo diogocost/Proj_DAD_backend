@@ -21,6 +21,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    msg : {
+        type: String,
+        default: "",
+    },
     errors: {
         type: Object,
         required: false,

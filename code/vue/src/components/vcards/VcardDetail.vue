@@ -25,7 +25,6 @@ const props = defineProps({
 const emit = defineEmits(["save", "cancel"]);
 
 const editingUser = ref(props.user)
-const errors = ref(props.errors)
 const inputPhotoFile = ref(null)
 const editingImageAsBase64 = ref(null)
 const deletePhotoOnTheServer = ref(false)

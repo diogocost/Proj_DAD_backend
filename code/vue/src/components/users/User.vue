@@ -17,7 +17,7 @@ const deleteConfirmationData = ref({
     password: '',
     confirmation_code: ''
 })
-//const socket = inject("socket")
+const socket = inject("socket")
 const props = defineProps({
     id: {
         type: Number,
@@ -77,8 +77,9 @@ const dismiss = async () => {
             socket.emit('deletedUser', userId)
             toast.success('Vcard #' + userId + ' was deleted successfully.')
             originalValueStr = JSON.stringify(user.value)
-            router.push({ name: 'home' })
+            router.back()
         } catch (error) {
+            console.log(error)
             if (error.response?.status == 422) {
                 errors.value = error.response.data.errors
                 toast.error('Vcard  #' + userStore.userId + ' was not deleted due to validation errors!')

@@ -15,16 +15,17 @@ const serverBaseUrl = inject("serverBaseUrl");
 const emit = defineEmits(['delete', 'blockUnblock', 'changeMaxDebit']);
 
 const columns = ref([
-  { headerName: 'Photo', field: 'photo_url', cellRenderer: params => {return `<div class="d-flex justify-content-center align-middle"><img src="${serverBaseUrl}/storage/fotos/${params.value || avatarNoneUrl}" class="rounded-circle img_photo" style="width: 40px; height: 40px;" /></div>`;}},
-  { headerName: 'Phone Number', field: 'phone_number', sortable: true },
-  { headerName: 'Name', field: 'name', sortable: true },
-  { headerName: 'Email', field: 'email', sortable: true },
-  { headerName: 'Balance', field: 'balance', sortable: true },
-  { headerName: 'Max Debit', field: 'max_debit', sortable: true },
-  { headerName: 'Blocked', field: 'blocked', sortable: true, cellRenderer: params => params.value ? 'Yes' : 'No' },
+  { headerName: 'Photo', field: 'photo_url', maxWidth:71, cellRenderer: params => {return `<div class="d-flex justify-content-center align-middle"><img src="${params.value ? serverBaseUrl + '/storage/fotos/' + params.value : avatarNoneUrl}" class="rounded-circle img_photo" style="width: 40px; height: 40px;" /></div>`;}},
+  { headerName: 'Phone Number', field: 'phone_number', maxWidth:130, sortable: true },
+  { headerName: 'Name', field: 'name', sortable: true, flex: 1, minWidth: 200 },
+  { headerName: 'Email', field: 'email', sortable: true, flex: 1, minWidth: 200 },
+  { headerName: 'Balance', field: 'balance', sortable: true, maxWidth:100 },
+  { headerName: 'Max Debit', field: 'max_debit', sortable: true, maxWidth:110 },
+  { headerName: 'Blocked', field: 'blocked', sortable: true, maxWidth:83, cellRenderer: params => params.value ? 'Yes' : 'No' },
   {
     headerName: 'Actions',
     field: 'actions',
+    flex: 1,
     cellRenderer: function(params) {
       // Create container
       const actionsDiv = document.createElement('div');

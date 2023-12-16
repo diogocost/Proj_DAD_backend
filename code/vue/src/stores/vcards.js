@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ref, computed } from 'vue';
+import { ref, computed, inject } from 'vue';
 import { defineStore } from 'pinia';
 import { useToast } from "vue-toastification";
 import { useUserStore } from './user';
@@ -9,7 +9,7 @@ export const useVcardsStore = defineStore('vcards', () => {
     const vcards = ref([]);
     const userStore = useUserStore();
     const totalVcards = computed(() => vcards.value.length);
-
+    const socket = inject('socket');
     function clearVcards() {
         vcards.value = []
     }
@@ -32,8 +32,6 @@ export const useVcardsStore = defineStore('vcards', () => {
             // Ensure correct structure for Axios request
             const response = await axios.get('vcards', { params: filterParams });
             vcards.value = response.data.data;
-            console.log('API response:', response.data);
-            console.log('filterParams:', filterParams);
 
             return vcards.value;
         } catch (error) {
@@ -49,7 +47,9 @@ export const useVcardsStore = defineStore('vcards', () => {
 
             const response = await axios.patch(`vcards/${vcard.phone_number}`, action)
             console.log('API response:', response.data)
-
+            if(action.blocked){
+                socket.emit('blockedUser', vcard)
+            }
             toast.success('Vcard updated successfully')
         } catch (error) {
             //console.log("HERE catch", vcard)
@@ -78,7 +78,7 @@ export const useVcardsStore = defineStore('vcards', () => {
 
     async function deleteVcard(vcardId, data) {
         try {
-            if(data){
+            if(!userStore.userIsAdmin){
                 const config = {
                     headers: {
                         "Content-Type": "application/json",
@@ -90,12 +90,12 @@ export const useVcardsStore = defineStore('vcards', () => {
                 userStore.clearUser();
             } else{
                 await axios.delete(`vcards/${vcardId}`);
+                socket.emit('deletedUser', vcardId)
                 vcards.value = vcards.value.filter(v => v.id !== vcardId);
             }
         } catch (error) {
             console.error(error);
-            clearVcards;
-            toast.error('Failed to fetch vCards');
+            toast.error('Failed to delete vcard');
             throw error;
         }
     }
