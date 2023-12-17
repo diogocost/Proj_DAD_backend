@@ -149,5 +149,10 @@ class VcardController extends Controller
     
         return new VcardResource($vcard);
     }
+
+    public function vcardsBalanceSum(){
+        $totalBalance = Vcard::sum('balance');
+        return response()->json(['total_balance' => $totalBalance]);
+    }
     
 }

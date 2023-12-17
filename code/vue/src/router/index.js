@@ -17,11 +17,8 @@ import Administrator from "../components/administrators/Administrator.vue"
 import Vcard from "../components/vcards/Vcard.vue"
 import Vcards from "../components/vcards/Vcards.vue"
 import Statistics from "../components/statistics/Statistics.vue"
+import AdminStatistics from "../components/statistics/AdminStatistics.vue"
 import Dashboard from "../components/dashboard/Dashboard.vue"
-//import Users from "../components/users/Users.vue"
-//import ProjectTasks from "../components/projects/ProjectTasks.vue"
-//import Task from "../components/tasks/Task.vue"
-//import Project from "../components/projects/Project.vue"
 
 let handlingFirstRoute = true
 
@@ -157,6 +154,11 @@ const router = createRouter({
       name: 'Statistics',
       component: Statistics,
     },
+    {
+      path: '/adminstatistics',
+      name: 'AdminStatistics',
+      component: AdminStatistics,
+    },
   ]
 })
 
@@ -179,7 +181,7 @@ router.beforeEach(async (to, from, next) => {
     return
   }
   if (to.name == 'Administrators' || to.name == 'Administrator' || to.name == 'NewAdministrators' || to.name == 'Vcards'
-      || to.name == 'DefaultCategories' || to.name == 'DefaultCategory' || to.name == 'NewDefaultCategory') {
+      || to.name == 'DefaultCategories' || to.name == 'DefaultCategory' || to.name == 'NewDefaultCategory' || to.name == "AdminStatistics") {
     if (userStore.user.user_type != 'A') {
       next({ name: 'home' })
       return

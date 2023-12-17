@@ -64,12 +64,30 @@ export const useTransactionsStore = defineStore('transactions', () => {
         return response.data.data
     }
 
+    async function deleteTransaction(deleteTransaction) {
+        // Note that when an error occours, the exception should be
+        // catch by the function that called the deleteTransaction
+        const response = await axios.delete('transactions/' + deleteTransaction.id)
+        let idx = transactions.value.findIndex((t) => t.id === response.data.data.id)
+        if (idx >= 0) {
+            transactions.value.splice(idx, 1)
+        }
+        return response.data.data
+    }
+
+    async function fetchAllTransactionsByDate() {
+        const response = await axios.get('/transactions');
+        return response.data.dates;
+    }
+  
     return {
         transactions,
         totalTransactions,
         loadTransactions,
         clearTransactions,
         insertTransaction,
-        updateTransaction
+        updateTransaction,
+        deleteTransaction,
+        fetchAllTransactionsByDate
     }
 })

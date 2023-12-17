@@ -1,6 +1,6 @@
 <script setup>
 import axios from 'axios'
-import { inject, onMounted } from 'vue'
+import { inject, onMounted, ref } from 'vue'
 import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useToast } from "vue-toastification"
 import { useUserStore } from './stores/user.js'
@@ -47,9 +47,6 @@ onMounted(() => {
     toast.success(`Your account has been deleted!`)
   })
 });
-/* onMounted(() => {
-  userStore.restoreToken()
-}) */
 </script>
 
 

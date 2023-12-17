@@ -247,4 +247,9 @@ class TransactionController extends Controller
             return response()->json(['message' => 'Error updating transaction'], 500);
         }
     }
+
+    public function getAllTransactions(){
+        $dates = Transaction::select('date')->get();
+        return response()->json(['dates' => $dates]);
+    }
 }
