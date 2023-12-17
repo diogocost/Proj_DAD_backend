@@ -192,6 +192,13 @@ class TransactionController extends Controller
             if ($request->payment_type == 'VCARD') {
                 return $this->handleVcardTransaction($request, $vcard);
             } else {
+                if ($vcard->blocked == 1) {
+                    return response()->json([
+                        'errors' => [
+                            'vcard' => ['This vcard is blocked!']
+                        ]
+                    ], 422);
+                }
                 // Handle transactions with other payment types
 
                 // Example payload for the external payment gateway service
