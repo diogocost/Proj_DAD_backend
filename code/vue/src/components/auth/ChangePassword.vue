@@ -1,12 +1,12 @@
 <script setup>
-//import { useToast } from "vue-toastification"
+import { useToast } from "vue-toastification"
 import { useRouter } from 'vue-router'
-//import { useUserStore } from '../../stores/user.js'
+import { useUserStore } from '../../stores/user.js'
 import { ref } from 'vue'
 
-//const toast = useToast()
+const toast = useToast()
 const router = useRouter()
-//const userStore = useUserStore()
+const userStore = useUserStore()
 
 const passwords = ref({
   current_password: '',
@@ -25,7 +25,7 @@ const changePassword = async () => {
     emit('changedPassword')
     router.back()
   } catch (error) {
-    if (error.response.status == 422) {
+    if (error.response?.status ? error.response.status == 422 : false) {
       errors.value = error.response.data.errors
       toast.error('Password has not been changed due to validation errors!')
     } else {

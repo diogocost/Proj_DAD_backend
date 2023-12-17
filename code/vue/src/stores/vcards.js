@@ -1,14 +1,15 @@
-import axios from 'axios'
-import { ref, computed, onMounted } from 'vue'
-import { defineStore } from 'pinia'
-import { useToast } from 'vue-toastification'
+import axios from 'axios';
+import { ref, computed, inject, onMounted } from 'vue';
+import { defineStore } from 'pinia';
+import { useToast } from "vue-toastification";
+import { useUserStore } from './user';
 
 export const useVcardsStore = defineStore('vcards', () => {
-    const toast = useToast()
-    const vcards = ref([])
-    console.log(vcards.value);
-
-    const totalVcards = computed(() => vcards.value.length)
+    const toast = useToast();
+    const vcards = ref([]);
+    const userStore = useUserStore();
+    const totalVcards = computed(() => vcards.value.length);
+    const socket = inject('socket');
 
     function clearVcards() {
         vcards.value = []
@@ -32,43 +33,34 @@ export const useVcardsStore = defineStore('vcards', () => {
             // Ensure correct structure for Axios request
             const response = await axios.get('vcards', { params: filterParams });
             vcards.value = response.data.data;
-            console.log('API response:', response.data);
-            console.log('filterParams:', filterParams);
 
             return vcards.value;
         } catch (error) {
-            console.error(error);
-            clearVcards;
-            toast.error('Failed to fetch vCards');
+            toast.error("Failed to update vCard");
         }
     }
 
+    async function loadVcard(vcardId) {
+        try {
+            const response = await axios.get(`vcards/${vcardId}`);
+            // Assuming response contains vcard data
+            return response.data;
+        } catch (error) {
+            // Handle error
+            throw error;
+        }
+    }
 
-
-    // async function manageVcard(vcardId, actionType, actionData = {}) {
-    //     try {
-    //         // Determine the payload based on actionType
-    //         let payload = {}
-    //         if (actionType === 'block' || actionType === 'unblock') {
-    //             payload.blocked = actionType === 'block'
-    //         } else if (actionType === 'changeMaxDebit') {
-    //             payload.max_debit = actionData.newMaxDebit // newMaxDebit needs to be passed as actionData
-    //         }
-
-    //         const response = await axios.patch(`vcards/${vcardId}`, payload)
-
-    //         const vcard = vcards.value.find((v) => v.id === vcardId)
-    //         if (vcard) {
-    //             if (data.blocked !== undefined) vcard.blocked = data.blocked
-    //             if (data.max_debit !== undefined) vcard.max_debit = data.max_debit
-    //         }
-
-    //         toast.success('Vcard updated successfully')
-    //     } catch (error) {
-    //         console.error(error)
-    //         toast.error('Failed to update vCard')
-    //     }
-    // }
+    async function loadVcard(vcardId) {
+        try {
+            const response = await axios.get(`vcards/${vcardId}`);
+            // Assuming response contains vcard data
+            return response.data;
+        } catch (error) {
+            // Handle error
+            throw error;
+        }
+    }
 
     async function blockUnblock(vcard) {
         try {
@@ -78,7 +70,9 @@ export const useVcardsStore = defineStore('vcards', () => {
 
             const response = await axios.patch(`vcards/${vcard.phone_number}`, action)
             console.log('API response:', response.data)
-
+            if(action.blocked){
+                socket.emit('blockedUser', vcard)
+            }
             toast.success('Vcard updated successfully')
         } catch (error) {
             //console.log("HERE catch", vcard)
@@ -105,15 +99,27 @@ export const useVcardsStore = defineStore('vcards', () => {
         }
     }
 
-
-    async function deleteVcard(vcard) {
+    async function deleteVcard(vcardId, data) {
         try {
-            await axios.delete('vcards/' + vcard.phone_number)
-            //vcards.value = vcards.value.filter((v) => v.id !== vcard.phone_number)
-            toast.success('Vcard deleted successfully')
+            if(!userStore.userIsAdmin){
+                const config = {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    data: data // Pass additional data here
+                };
+                socket.emit('deletedUser', vcardId)
+                await axios.delete(`vcards/${vcardId}`, config);
+                userStore.clearUser();
+            } else{
+                await axios.delete(`vcards/${vcardId}`);
+                socket.emit('deletedUser', vcardId)
+                vcards.value = vcards.value.filter(v => v.id !== vcardId);
+            }
         } catch (error) {
-            console.error(error)
-            toast.error('Failed to delete vCard')
+            console.error(error);
+            toast.error('Failed to delete vcard');
+            throw error;
         }
     }
 
@@ -129,8 +135,8 @@ export const useVcardsStore = defineStore('vcards', () => {
     return {
         vcards,
         totalVcards,
+        loadVcard,
         fetchVcards,
-        //manageVcard,
         deleteVcard,
         blockUnblock,
         changeMaxDebitVcard,

@@ -65,7 +65,7 @@ class Vcard extends Model
 
     public function transactions()
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Transaction::class, 'vcard', 'phone_number');
     }
 
     public function initializeDefaultCategories()

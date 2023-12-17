@@ -89,7 +89,7 @@ setTimeout(() => {
 
 <template>
   <ag-grid-vue style="width: 100%; height: 100%;" :rowHeight="45" class="ag-theme-quartz" :columnDefs="columns"
-    :rowData="editingTransactions" :pagination="true">
+    :rowData="editingTransactions" :pagination="true" :paginationPageSize="50">
   </ag-grid-vue>
 </template>
 

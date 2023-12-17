@@ -49,16 +49,20 @@ const columns = ref([
     { headerName: '#', field: 'id', sortable: true, sort: 'asc', flex: 1 },
     { headerName: 'Name', field: 'name', sortable: false, sortingOrder: ['asc', 'desc'], flex: 1 },
     {
-        headerName: 'Type', field: 'type', sortable: false, flex: 1, filter: 'agTextColumnFilter',
-        filterParams: {
-            values: ['Debit', 'Credit'], // Only these values will be shown in the filter
-            valueFormatter: function (params) {
-                return params.value === 'D' ? 'Debit' : params.value === 'C' ? 'Credit' : '';
+        headerName: 'Type', field: 'type', sortable: false, flex: 1,
+        cellRenderer: function (params) {
+            // Custom rendering for the Type column
+            if (params.value == 'C') {
+                return 'Credit'
+            } else if (params.value == 'D') {
+                return 'Debit'
+            } else {
+                return params.value
             }
         }
     },
     {
-        headerName: 'Actions', field: 'actions', sortable: false, flex: 1, cellRenderer: function (params) {
+        headerName: 'Edit', field: 'edit', sortable: false, maxWidth: 100, minWidth: 100, cellRenderer: function (params) {
             // Custom rendering for the Actions column
             const button = document.createElement('button');
             button.innerHTML = '<i class="bi bi-xs bi-pencil"></i>';
@@ -69,16 +73,24 @@ const columns = ref([
             div.className = 'd-flex justify-content-start';
             div.appendChild(button);
 
-            const button2 = document.createElement('button');
-            button2.innerHTML = '<i class="bi bi-xs bi-x-square-fill"></i>';
-            button2.className = 'btn btn-sm btn-light mx-2 my-1';
-            button2.addEventListener('click', () => deleteClick(params.data));
-
-            div.appendChild(button2);
-
             return div;
         }
     }, // Add actions column
+    {
+        headerName: 'Delete', field: 'delete', sortable: false, maxWidth: 100, minWidth: 100, cellRenderer: function (params) {
+            // Custom rendering for the Actions column
+            const button = document.createElement('button');
+            button.innerHTML = '<i class="bi bi-xs bi-x-square-fill"></i>';
+            button.className = 'btn btn-sm btn-light mx-2 my-1';
+            button.addEventListener('click', () => deleteClick(params.data));
+
+            const div = document.createElement('div');
+            div.className = 'd-flex justify-content-start';
+            div.appendChild(button);
+
+            return div;
+        }
+    }
 ]);
 
 const editClick = (defaultCategory) => {

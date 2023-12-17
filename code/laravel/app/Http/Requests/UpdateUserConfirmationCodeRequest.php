@@ -22,7 +22,7 @@ class UpdateUserConfirmationCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'confirmation_code' => ['required', 'numeric', 'digits:4'],
+            'confirmation_code' => ['required', 'numeric', 'digits:3', 'confirmed'],
             'current_password' => 'required',
         ];
     }

@@ -11,6 +11,7 @@ use App\Http\Requests\ManageVcardRequest;
 use App\Models\Vcard;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 use App\Http\Requests\VcardIndexRequest;
 
@@ -73,15 +74,17 @@ class VcardController extends Controller
 
     public function updatesConfirmationCode(UpdateUserConfirmationCodeRequest $request, Vcard $vcard)
     {
-        $password = bcrypt($request->current_password);
-
         // Check if the password is correct
-        if ($password != $vcard->password) {
-            return response()->json(['messages' => 'The password field is incorrect!'], 403);
+        if (!Hash::check($request->current_password, $vcard->password)) {
+            return response()->json([
+                'errors' => [
+                    'current_password' => ['The password field is incorrect!']
+                ]
+            ], 422);
         }
         
         try {
-            $vcard->confirmation_code = bcrypt($request->validated()['confirmation_code']);
+            $vcard->confirmation_code = Hash::make($request->confirmation_code);
             $vcard->save();
             return new VcardResource($vcard);
         } catch (\Exception $ex) {
@@ -96,16 +99,10 @@ class VcardController extends Controller
 
     public function destroy(DeleteVcardRequest $request, Vcard $vcard)
     {
-        
-        
-        $password = bcrypt($request->password);
-        $confirmation_code = bcrypt($request->confirmation_code);
-        $messages = [];
-
         $user=Auth::guard('api')->user();
         if (!$user->user_type == 'A') {
-            $password = bcrypt($request->password);
-            $confirmation_code = bcrypt($request->confirmation_code);
+            $password = Hash::make($request->password);
+            $confirmation_code = Hash::make($request->confirmation_code);
     
             $messages = [];
     
@@ -123,7 +120,7 @@ class VcardController extends Controller
                 return response()->json(['messages' => $messages], 403);
             }
         }
-        try {
+
             if($vcard->transactions()->count() > 0){
                 $vcard->transactions()->delete();
                 $vcard->categories()->delete();
@@ -133,9 +130,6 @@ class VcardController extends Controller
                 $vcard->forceDelete();
             }
             return response()->json(['message' => 'Vcard deleted successfully'], 200);
-        } catch (\Exception $ex) {
-            return response()->json(['message' => 'Error deleting vcard'], 500);
-        }
     }
 
 

@@ -19,14 +19,18 @@ const credentials = ref({
 const emit = defineEmits(['login'])
 
 const login = async () => {
-  if (await userStore.login(credentials.value)) {
+  try {
+    await userStore.login(credentials.value)
     toast.success('User ' + userStore.user.name + ' has entered the application.')
-    categoriesStore.loadCategories()
     emit('login')
-    router.back()
-  } else {
+    router.push({ name: 'dashboard' })
+  } catch (error) {
     credentials.value.password = ''
-    toast.error('User credentials are invalid!')
+    if(error.response?.status == 403) {
+      toast.error(error.response.data.message)
+    } else {
+      toast.error('User credentials are invalid!')
+    }
   }
 }
 

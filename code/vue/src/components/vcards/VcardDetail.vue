@@ -2,6 +2,7 @@
 import { ref, watch, computed, inject } from "vue";
 import avatarNoneUrl from '@/assets/avatar-none.png'
 import { useUserStore } from '../../stores/user.js'
+import FieldErrorMessage from "../global/FieldErrorMessage.vue";
 
 const serverBaseUrl = inject("serverBaseUrl");
 const userStore = useUserStore()
@@ -24,7 +25,6 @@ const props = defineProps({
 const emit = defineEmits(["save", "cancel"]);
 
 const editingUser = ref(props.user)
-
 const inputPhotoFile = ref(null)
 const editingImageAsBase64 = ref(null)
 const deletePhotoOnTheServer = ref(false)
@@ -133,12 +133,12 @@ const cleanPhoto = () => {
             class="form-control"
             pattern="[9]{1}[0-9]{8}"
             maxlength="9"
-            :class="{ 'is-invalid': errors ? errors['phoneNumber'] : false }"
+            :class="{ 'is-invalid': errors ? errors['phone_number'] : false }"
             id="inputPhoneNumber"
             required
             v-model="editingUser.phone_number"
           />
-          <field-error-message :errors="errors" fieldName="phoneNumber"></field-error-message>
+          <field-error-message :errors="errors" fieldName="phone_number"></field-error-message>
         </div>
 
         <div class="mb-3 px-1">
@@ -196,28 +196,28 @@ const cleanPhoto = () => {
           <field-error-message :errors="errors" fieldName="password_confirmation"></field-error-message>
         </div>
         <div class="mb-3" v-if="inserting">
-          <label for="inputPin" class="form-label">4-digit Pin Code</label>
+          <label for="inputPin" class="form-label">3-digit Confirmation Code</label>
           <input
               type="password"
               maxlength="4"
               class="form-control"
-              :class="{ 'is-invalid': errors ? errors['pin_code'] : false }"
+              :class="{ 'is-invalid': errors ? errors['confirmation_code'] : false }"
               id="inputPin"
               v-model="editingUser.confirmation_code"
           />
-          <field-error-message :errors="errors" fieldName="pin_code"></field-error-message>
+          <field-error-message :errors="errors" fieldName="confirmation_code"></field-error-message>
         </div>
         <div class="mb-3"  v-if="inserting">
-          <label for="inputPinConfirmation" class="form-label">4-digit Pin Code Confirmation</label>
+          <label for="inputPinConfirmation" class="form-label">3-digit Confirmation Code Confirmation</label>
           <input
               type="password"
               maxlength="4"
               class="form-control"
-              :class="{ 'is-invalid': errors ? errors['pin_code_confirmation'] : false }"
+              :class="{ 'is-invalid': errors ? errors['confirmation_code'] : false }"
               id="inputPinConfirmation"
               v-model="editingUser.confirmation_code_confirmation"
           />
-          <field-error-message :errors="errors" fieldName="pin_code_confirmation"></field-error-message>
+          <field-error-message :errors="errors" fieldName="confirmation_code"></field-error-message>
         </div>
       </div>
       <div class="w-25">

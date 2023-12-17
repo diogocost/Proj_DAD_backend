@@ -10,7 +10,7 @@ const toast = useToast()
 
 const gridOptions = ref({
     pagination: true,
-    paginationPageSize: 10, // Set the number of rows per page
+    paginationPageSize: 20, // Set the number of rows per page
     rowSelection: 'single', // Set the row selection type if needed
     // Add other grid options as needed
     domLayout: 'autoHeight',
@@ -117,7 +117,7 @@ const deleteCategoryConfirmed = async () => {
         let deletedCategory = response.data.data
         toast.info(`Category ${categoryToDeleteName.value} was deleted`)
         emit("deleted", deletedCategory)
-        gridOptions.value.api.setRowData(editingCategories.value)
+        gridOptions.value.api.updateGridOptions({ rowData: editingCategories.value });
     } catch (error) {
         console.log(error)
         toast.error(`It was not possible to delete Category ${categoryToDeleteName.value}!`)
