@@ -13,7 +13,7 @@ use App\Http\Controllers\api\DefaultCategoryController;
 
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [UserController::class, 'store'])->middleware('can:create,App\Models\User');
-Route::middleware('auth:api')->group(
+Route::middleware('auth:api', 'blocked')->group(
     function () {
         Route::post('auth/logout', [AuthController::class, 'logout']);
 
@@ -25,8 +25,8 @@ Route::middleware('auth:api')->group(
         //Vcard routes
         Route::patch('vcards/{vcard}/confirmation_code', [VcardController::class, 'updatesConfirmationCode'])->middleware('can:updateConfirmationCode,vcard');
         Route::get('vcards/{vcard}/categories', [CategoryController::class, 'getCetegoriesOfVcard'])->middleware('can:viewCategories,vcard');
-        Route::get('vcards/{vcard}/transactions', [TransactionController::class, 'getTransactionsOfVcard'])->middleware('can:viewCategories,vcard');
-        Route::get('vcards', [VcardController::class, 'index'])->middleware('can:showAll,App\Models\VCard');
+        Route::get('vcards/{vcard}/transactions', [TransactionController::class, 'getTransactionsOfVcard'])->middleware('can:viewTransactions,vcard');
+        Route::get('vcards', [VcardController::class, 'index'])->middleware('can:showAll,App\Models\Vcard');
 
         Route::get('vcards/{vcard}', [VcardController::class, 'show'])->middleware('can:view,vcard');
         Route::delete('vcards/{vcard}', [VcardController::class, 'destroy'])->middleware('can:delete,vcard');   // NOT working

@@ -28,7 +28,7 @@ class UpdateUserRequest extends FormRequest
 
         // Check if user_type is 'V' (Vcard) to apply photo_file rule
         if ($this->input('user_type') === 'V') {
-            $rules['photo_file'] = 'nullable|file|image';
+            $rules['base64ImagePhoto'] = 'nullable|string';
         }
 
         return $rules;

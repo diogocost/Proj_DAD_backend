@@ -49,7 +49,7 @@ class CreateTransactionRequest extends FormRequest
             $rules['payment_type'] = ['required', 'in:VCARD'];
             $rules['category_id'] = ['nullable', 'exists:categories,id'];
             $rules['description'] = ['nullable', 'string'];
-            $rules['confirmation_code'] = ['required', 'numeric', 'digits:4'];
+            $rules['confirmation_code'] = ['required', 'numeric'];
         }
 
         return $rules;

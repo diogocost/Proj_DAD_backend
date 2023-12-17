@@ -33,8 +33,8 @@ class CreateUserRequest extends FormRequest
                 'password' => ['required', 'confirmed'],
                 'email' => ['required', 'email'],
                 'name' => ['required'],
-                'confirmation_code' => ['required', 'numeric', 'digits:4'],
-                'photo_url' => ['nullable', 'file', 'image'],
+                'confirmation_code' => ['required', 'numeric'],
+                'base64ImagePhoto' => ['nullable', 'string'],
                 'phone_number' => ['required', 'unique:vcards,phone_number', 'regex:/^9\d{8}$/'],
             ];
         }

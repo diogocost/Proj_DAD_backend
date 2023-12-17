@@ -56,7 +56,6 @@ export const useTransactionsStore = defineStore('transactions', () => {
     async function updateTransaction(updateTransaction) {
         // Note that when an error occours, the exception should be
         // catch by the function that called the updateTransaction
-        console.log(updateTransaction)
         const response = await axios.patch('transactions/' + updateTransaction.id, updateTransaction)
         let idx = transactions.value.findIndex((t) => t.id === response.data.data.id)
         if (idx >= 0) {

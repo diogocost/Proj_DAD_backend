@@ -25,6 +25,11 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await axios.get('users/me')
             user.value = response.data.data
+            if(user.value.user_type == 'A'){
+                await defaultCategoriesStore.loadDefaultCategories()
+            } else if (user.value.user_type == 'V'){
+                await categoriesStore.loadCategories()
+            }
             socket.emit('loggedIn', user.value)
         } catch (error) {
             clearUser()
@@ -38,16 +43,11 @@ export const useUserStore = defineStore('user', () => {
             axios.defaults.headers.common.Authorization = "Bearer " + response.data.access_token
             sessionStorage.setItem('token', response.data.access_token)
             await loadUser()
-            if(user.value.user_type == 'A'){
-                await defaultCategoriesStore.loadDefaultCategories()
-            } else if (user.value.user_type == 'V'){
-                await categoriesStore.loadCategories()
-            }
             return true
         }
         catch (error) {
             clearUser()
-            return false
+            throw error
         }
     }
     async function logout() {
@@ -73,11 +73,6 @@ export const useUserStore = defineStore('user', () => {
         if (storedToken) {
             axios.defaults.headers.common.Authorization = "Bearer " + storedToken
             await loadUser()
-            if(user.value.user_type == 'A'){
-                await defaultCategoriesStore.loadDefaultCategories()
-            } else if (user.value.user_type == 'V'){
-                await categoriesStore.loadCategories()
-            }
             return true
         }
         clearUser()
@@ -107,5 +102,17 @@ export const useUserStore = defineStore('user', () => {
     
     }
 
-    return { user, userId, userIsAdmin, userName, userPhotoUrl, loadUser, clearUser, login, logout, restoreToken, changeConfirmationCode, changePassword }
+    async function updateUser(userToUpdateId, userToUpdateData) {
+        try {
+            const response = await axios.put('users/' + userToUpdateId, userToUpdateData)
+            if (userToUpdateId == userId.value) {
+                await loadUser()
+            }
+            return response.data.data
+        } catch (error) {
+            throw error
+        }
+    }
+
+    return { user, userId, userIsAdmin, userName, userPhotoUrl, loadUser, clearUser, login, logout, restoreToken, changeConfirmationCode, changePassword, updateUser }
 })

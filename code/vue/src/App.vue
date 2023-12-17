@@ -37,6 +37,15 @@ onMounted(() => {
     toast.success(`Received new transaction #${transaction.id}, Amount : ${transaction.value}€!`)
     transactionsStore.loadTransactions()
   })
+  socket.on('blockedUser', (user) => {
+    userStore.clearUser()
+    toast.error(`Your account has been blocked!`)
+  })
+  socket.on('deletedUser', (user) => {
+    userStore.clearUser()
+    router.push({ name: 'home' })
+    toast.success(`Your account has been deleted!`)
+  })
 });
 /* onMounted(() => {
   userStore.restoreToken()

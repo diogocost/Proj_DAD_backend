@@ -67,8 +67,8 @@ const save = async (userToSave) => {
       })
       router.push({name: 'home'})
     } catch (error) {
-      console.log(error)
-      if (error.response.status == 422) {
+        console.log(error)
+      if (error.response?.status == 422) {
         errors.value = error.response.data.errors
         toast.error('Vcard was not registered due to validation errors!')
       } else {

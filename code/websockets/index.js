@@ -15,14 +15,12 @@ io.on("connection", (socket) => {
   console.log(`client ${socket.id} has connected`);
 
   socket.on('loggedIn', function (user) {
-    console.log(user)
     socket.join(user.id)
     if (user.type == 'A') {
       socket.join('administrator')
     }
   })
   socket.on('loggedOut', function (user) {
-    console.log(user)
     socket.leave(user.id)
     if (user.type == 'A') {
       socket.leave('administrator')
@@ -30,17 +28,21 @@ io.on("connection", (socket) => {
   })
 
   socket.on('newTransaction', function (transaction) {
-    console.log(transaction)
     if(transaction.payment_type == 'VCARD'){
-      console.log('pair_vcard',transaction.pair_vcard)
       socket.in(parseInt(transaction.pair_vcard)).emit('newTransaction', transaction)
     }
     else{
-      console.log('vcard',transaction.vcard)
       socket.in(transaction.vcard).emit('newTransaction', transaction)
     }
   })
-  socket.on('updatedUser', function (user) {
-    socket.in(user.id).emit('updatedUser', user)
+  socket.on('blockedUser', function (user) {
+    socket.in(user.phone_number).emit('blockedUser', user)
+  })
+  socket.on('deletedUser', function (userId) {
+    socket.in(userId).emit('deletedUser', userId)
+    socket.leave(userId)
+    if(userId < 900000001){
+      socket.leave('administrator')
+    }
   })
 });
