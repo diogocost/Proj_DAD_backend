@@ -32,7 +32,7 @@ app.provide(
   })
 ) */
 
-const serverBaseUrl = 'http://laravel.test'
+const serverBaseUrl = 'http://127.0.0.1:8000'
 app.provide('serverBaseUrl', serverBaseUrl) 
 app.provide('socket', io("http://localhost:8080"))
 

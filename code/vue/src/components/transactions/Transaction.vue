@@ -39,6 +39,8 @@ const loadTransaction = async (id) => {
   errors.value = null
   if (!id || (id < 0)) {
     transaction.value = newtransaction()
+    transaction.value.vcard = props.vcardId
+    console.log("HERE", transaction)
     originalValueStr = JSON.stringify(transaction.value)
   } else {
     try {
@@ -107,6 +109,10 @@ const cancel = () => {
 
 const props = defineProps({
   id: {
+    type: Number,
+    default: null
+  },
+  vcardId: {
     type: Number,
     default: null
   },

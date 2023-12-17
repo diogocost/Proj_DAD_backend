@@ -58,6 +58,12 @@ const handleChangeMaxDebit = async (data) => {
   fetchFunction()
 };
 
+const handleAddCredit = async (vcard) => {
+  //let test = -2
+  //router.push({ name: 'NewTransactionAddCredit', params: { id: test } })
+  router.push({ name: 'NewTransactionAddCredit', query: { vcard_id: vcard.phone_number } });
+}
+
 const fetchFunction = () => {
   store.fetchVcards(filterParams.value);
 }
@@ -111,7 +117,8 @@ const fetchFunction = () => {
       :vcards="vcards" 
       @delete="handleDelete" 
       @blockUnblock="handleBlockUnblock"  
-      @changeMaxDebit="handleChangeMaxDebit">
+      @changeMaxDebit="handleChangeMaxDebit"
+      @addCredit="handleAddCredit">
     </VcardTable>
   </div>
 </template>

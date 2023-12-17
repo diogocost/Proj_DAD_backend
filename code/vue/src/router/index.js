@@ -97,6 +97,12 @@ const router = createRouter({
       props: route => ({ id: parseInt(route.params.id) })
     },
     {
+      path: '/transactions/addCredit',
+      name: 'NewTransactionAddCredit',
+      component: Transaction,
+      props: route => ({ vcardId: parseInt(route.query.vcard_id) })
+    },
+    {
       path: '/categories',
       name: 'Categories',
       component: Categories,
