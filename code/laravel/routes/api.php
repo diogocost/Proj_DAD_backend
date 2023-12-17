@@ -25,6 +25,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('vcards/{vcard}/categories', [CategoryController::class, 'getCetegoriesOfVcard'])->middleware('can:viewCategories,vcard');
         Route::get('vcards/{vcard}/transactions', [TransactionController::class, 'getTransactionsOfVcard'])->middleware('can:viewTransactions,vcard');
         Route::get('vcards', [VcardController::class, 'index'])->middleware('can:showAll,App\Models\Vcard');
+        Route::get('totalbalance', [VcardController::class, 'vcardsBalanceSum'])->middleware('can:viewAny, App\Models\Admin');
 
         Route::get('vcards/{vcard}', [VcardController::class, 'show'])->middleware('can:view,vcard');
         Route::delete('vcards/{vcard}', [VcardController::class, 'destroy'])->middleware('can:destroy,App\Models\VCard');   // NOT working
@@ -40,6 +41,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('transactions/{transaction}', [TransactionController::class, 'show'])->middleware('can:view,transaction');
         Route::post('transactions', [TransactionController::class, 'store'])->middleware('can:create,App\Models\Transaction');
         Route::patch('transactions/{transaction}', [TransactionController::class, 'update'])->middleware('can:update,App\Models\Transaction');
+        Route::get('transactions', [TransactionController::class, 'getAllTransactions'])->middleware('can:viewAny,App\Models\Admin');        
 
         //Admin routes
         Route::get('admins/{admin}', [AdminController::class, 'show'])->middleware('can:view,admin');

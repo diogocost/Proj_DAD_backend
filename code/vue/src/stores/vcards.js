@@ -1,11 +1,12 @@
 import axios from 'axios'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { defineStore } from 'pinia'
 import { useToast } from 'vue-toastification'
 
 export const useVcardsStore = defineStore('vcards', () => {
     const toast = useToast()
     const vcards = ref([])
+    console.log(vcards.value);
 
     const totalVcards = computed(() => vcards.value.length)
 
@@ -116,6 +117,15 @@ export const useVcardsStore = defineStore('vcards', () => {
         }
     }
 
+    async function fetchTotalBalance() {
+        try {
+            const response = await axios.get('/totalbalance');
+            return response.data.total_balance;
+        } catch (error) {
+            console.error('Error fetching total balance:', error);
+        }
+    }
+
     return {
         vcards,
         totalVcards,
@@ -123,6 +133,7 @@ export const useVcardsStore = defineStore('vcards', () => {
         //manageVcard,
         deleteVcard,
         blockUnblock,
-        changeMaxDebitVcard
+        changeMaxDebitVcard,
+        fetchTotalBalance
     }
 })

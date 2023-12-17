@@ -72,6 +72,11 @@ export const useTransactionsStore = defineStore('transactions', () => {
         return response.data.data
     }
 
+    async function fetchAllTransactionsByDate() {
+        const response = await axios.get('/transactions');
+        return response.data.dates;
+    }
+
     return {
         transactions,
         totalTransactions,
@@ -79,6 +84,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
         clearTransactions,
         insertTransaction,
         updateTransaction,
-        deleteTransaction
+        deleteTransaction,
+        fetchAllTransactionsByDate
     }
 })

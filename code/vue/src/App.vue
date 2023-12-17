@@ -1,13 +1,13 @@
 <script setup>
 import axios from 'axios'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter, RouterLink, RouterView } from 'vue-router'
 import { useToast } from "vue-toastification"
 import { useUserStore } from './stores/user.js'
 //import { useProjectsStore } from "./stores/projects.js"
 
 const userStore = useUserStore()
-//const projectsStore = useProjectsStore()
+
 
 const router = useRouter()
 const toast = useToast()
@@ -30,9 +30,6 @@ const clickMenuOption = () => {
   }
 }
 
-/* onMounted(() => {
-  userStore.restoreToken()
-}) */
 </script>
 
 
