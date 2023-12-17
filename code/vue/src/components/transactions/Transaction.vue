@@ -58,6 +58,9 @@ const save = async () => {
   if (operation.value == 'insert') {
     console.log('inserting transaction', transaction.value)
     try {
+      if(transaction.value.vcard == null){
+        transaction.value.vcard = userStore.userIsAdmin ? '' : userStore.userId.toString()
+      }
       transaction.value = await transactionsStore.insertTransaction(transaction.value)
       originalValueStr = JSON.stringify(transaction.value)
       toast.success('Transaction #' + transaction.value.id + ' was created successfully.')
