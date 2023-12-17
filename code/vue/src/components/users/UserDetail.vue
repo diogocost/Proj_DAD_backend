@@ -139,7 +139,7 @@ const cleanPhoto = () => {
           <div class="form-control text-center">
             <img type="file" :src="photoFullUrl" class="w-100" />
           </div>
-          <div class="mt-3 d-flex justify-content-between flex-wrap">
+          <div class="mt-3 d-flex justify-content-between flex-wrap" v-if="editingUser.user_type == 'V'">
             <label for="inputPhoto" class="btn btn-dark flex-grow-1 mx-1">Carregar</label>
             <button class="btn btn-secondary flex-grow-1 mx-1" @click.prevent="resetToOriginalPhoto"
               v-if="editingUser.photo_url">Repor</button>

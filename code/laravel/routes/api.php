@@ -49,6 +49,7 @@ Route::middleware('auth:api', 'blocked')->group(
         Route::get('admins/{admin}', [AdminController::class, 'show'])->middleware('can:view,admin');
         Route::get('admins', [AdminController::class, 'index'])->middleware('can:viewAny,App\Models\Admin');   //working
         Route::delete('admins/{admin}', [AdminController::class, 'destroy'])->middleware('can:delete,admin');
+        Route::post('admins', [UserController::class, 'store'])->middleware('can:create,App\Models\User');
 
         //DefaultCategory routes
         Route::get('default_categories', [DefaultCategoryController::class, 'index'])->middleware('can:viewAny,App\Models\DefaultCategory');

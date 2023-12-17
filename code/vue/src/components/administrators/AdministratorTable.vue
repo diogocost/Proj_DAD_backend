@@ -85,7 +85,7 @@ const administratorToDeleteName = computed(() => administratorToDelete.value
                 <th v-if="showId">#</th>
                 <th>Name</th>
                 <th v-if="showEmail">Email</th>
-                <th v-if="showEditButton || showDeleteButton"></th>
+                <th v-if="showDeleteButton"></th>
             </tr>
         </thead>
         <tbody>

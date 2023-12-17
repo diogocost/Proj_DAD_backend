@@ -14,6 +14,7 @@ const newAdministrator = () => {
     name: '',
     email:'',
     password: '',
+    password_confirmation: '',
   }
 }
 const administrator = ref(newAdministrator())

@@ -174,13 +174,6 @@ onMounted(() => {
                 ADM Default Categories List
               </router-link>
             </li>
-            <li class="nav-item" v-if="userStore.userIsAdmin"> <!-- v-show="userStore.user?.type == 'A'" -->
-              <router-link class="nav-link" :class="{ active: $route.name === 'Statistics' }" :to="{ name: 'Statistics' }"
-                @click="clickMenuOption"> <!--  -->
-                <i class="bi bi-bar-chart-line"></i>
-                BOTH Statistics
-              </router-link>
-            </li>
           </ul>
 
           <!-- HERE -->

@@ -82,7 +82,7 @@
         id="inputEmail"
         placeholder="Email"
         required
-        v-model="editingAdministrator.username"
+        v-model="editingAdministrator.email"
       >
       <field-error-message :errors="errors" fieldName="email"></field-error-message>
     </div>
@@ -102,6 +102,18 @@
       >
       <field-error-message :errors="errors" fieldName="password"></field-error-message>
     </div>
+    <div class="mb-3">
+          <label for="inputPasswordConfirmation" class="form-label">Password Confirmation</label>
+          <input
+              type="password"
+              class="form-control"
+              :class="{ 'is-invalid': errors ? errors['password_confirmation'] : false }"
+              id="inputPasswordConfirmation"
+              placeholder="Password Confirmation"
+              v-model="editingAdministrator.password_confirmation"
+          />
+          <field-error-message :errors="errors" fieldName="password_confirmation"></field-error-message>
+        </div>
     <div class="mb-3 d-flex justify-content-end">
       <button
         type="button"
